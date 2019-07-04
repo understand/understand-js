@@ -1,0 +1,63 @@
+{
+  "name": "understand-js-handler",
+  "version": "0.0.1",
+  "description": "understand-js-handler",
+  "engines": {
+    "node": ">=6"
+  },
+  "module": "build/bundle.es6.min.js",
+  "browser": "build/bundle.es5.min.js",
+  "main": "build/bundle.es6.min.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup --config",
+    "build:watch": "rollup --config --watch",
+    "link:yarn": "yarn link",
+    "lint": "run-s lint:prettier lint:tslint",
+    "lint:prettier": "prettier --check \"{src,tests}/**/*.js\"",
+    "lint:eslint": "eslint .",
+    "fix": "run-s fix:eslint fix:prettier",
+    "fix:prettier": "prettier --write \"{src,tests}/**/*.js\"",
+    "fix:eslint": "eslint --fix .",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aivis/understand-js-handler.git"
+  },
+  "author": "Mettle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aivis/understand-js-handler/issues"
+  },
+  "homepage": "https://github.com/aivis/understand-js-handler#readme",
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babelrc-rollup": "^3.0.0",
+    "core-js": "^3.1.0",
+    "eslint": "^5.16.0",
+    "jest": "^24.7.1",
+    "jsdom": "^15.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "1.17.0",
+    "rollup": "^1.10.1",
+    "rollup-plugin-alias": "^1.5.1",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-bundle-size": "^1.0.3",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-license": "^0.8.1",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-replace": "^2.2.0",
+    "rollup-plugin-terser": "^4.0.4",
+    "xhr-mock": "^2.4.1"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.4.4",
+    "js-sha1": "^0.6.0",
+    "stacktrace-js": "^2.0.0"
+  }
+}
