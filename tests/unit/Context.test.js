@@ -33,7 +33,7 @@ describe('Context', () => {
     test('it should throw an error when setting an invalid value as session id', () => {
       [null, undefined, NaN, '', 0].forEach(val => {
         expect(() => {
-          context.setSessionId(val)
+          context.setSessionId(val);
         }).toThrow();
       });
     });
@@ -61,14 +61,16 @@ describe('Context', () => {
 
       expect(sessionStorage.setItem).toHaveBeenCalledTimes(1);
       expect(Object.keys(sessionStorage.__STORE__).length).toBe(1);
-      expect(JSON.parse(sessionStorage.getItem('understand_session_id')).session_id).toEqual(session_id);
+      expect(
+        JSON.parse(sessionStorage.getItem('understand_session_id')).session_id
+      ).toEqual(session_id);
     });
 
     test('it should refresh the session id value stored in session storage if it is older than 2 hours', () => {
       const session_id = context.getSessionId();
 
       sessionStorage.__STORE__['understand_session_id'] = JSON.stringify({
-        expire_at: new Date(new Date().getTime() - (1000 * 60 * 60 * 2)),
+        expire_at: new Date(new Date().getTime() - 1000 * 60 * 60 * 2),
         session_id
       });
 
@@ -80,7 +82,9 @@ describe('Context', () => {
         request_id: '08394443-31d5-4d65-8392-a29d733c498d'
       });
 
-      expect(context.getRequestId()).toEqual('08394443-31d5-4d65-8392-a29d733c498d');
+      expect(context.getRequestId()).toEqual(
+        '08394443-31d5-4d65-8392-a29d733c498d'
+      );
     });
 
     test('it should add request id provided by the user via setter', () => {
@@ -94,12 +98,12 @@ describe('Context', () => {
     test('it should throw an error when setting an invalid value as request id', () => {
       [null, undefined, NaN, '', 0].forEach(val => {
         expect(() => {
-          context.setRequestId(val)
+          context.setRequestId(val);
         }).toThrow();
       });
     });
 
-     test('it should return a default request id value if not provided by the user', () => {
+    test('it should return a default request id value if not provided by the user', () => {
       const request_id = context.getRequestId();
 
       expect(typeof request_id).toEqual('string');
@@ -158,7 +162,7 @@ describe('Context', () => {
     test('it should throw an error when setting an invalid value as user id', () => {
       [null, undefined, NaN, '', 0].forEach(val => {
         expect(() => {
-          context.setUserId(val)
+          context.setUserId(val);
         }).toThrow();
       });
     });
@@ -192,7 +196,7 @@ describe('Context', () => {
     test('it should throw an error when setting an invalid value as client ip', () => {
       [null, undefined, NaN, '', 0].forEach(val => {
         expect(() => {
-          context.setClientIp(val)
+          context.setClientIp(val);
         }).toThrow();
       });
     });
@@ -302,21 +306,21 @@ describe('Context', () => {
 
   test('it should initialize context via JS object', () => {
     context = new Context({
-      'session_id': '123456',
-      'request_id': '08394443-31d5-4d65-8392-a29d733c498d',
-      'user_id': 1,
-      'client_ip': '192.168.10.10',
-      'tags': ['one', 'two', 'three']
+      session_id: '123456',
+      request_id: '08394443-31d5-4d65-8392-a29d733c498d',
+      user_id: 1,
+      client_ip: '192.168.10.10',
+      tags: ['one', 'two', 'three']
     });
 
     expect(context.session).toMatchObject({
-      'session_id': '123456',
-      'request_id': '08394443-31d5-4d65-8392-a29d733c498d'
+      session_id: '123456',
+      request_id: '08394443-31d5-4d65-8392-a29d733c498d'
     });
 
     expect(context.user).toMatchObject({
-      'user_id': 1,
-      'client_ip': '192.168.10.10'
+      user_id: 1,
+      client_ip: '192.168.10.10'
     });
 
     expect(context.tags).toEqual(['one', 'two', 'three']);

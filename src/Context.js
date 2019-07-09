@@ -1,7 +1,7 @@
 import sha1 from 'js-sha1';
 import uuidv4 from 'uuid/v4';
+import { getGlobalObject, isPrimitive } from 'applicationRoot/utils/helpers';
 
-import { getGlobalObject, isString, isPrimitive } from 'applicationRoot/utils/helpers';
 import DEFAULT_TAGS from 'applicationRoot/utils/DefaultTags';
 
 const SESSION_STORAGE_KEY = 'understand_session_id';
@@ -45,13 +45,13 @@ export default class Context {
    * @return {this}
    */
   setUserId(user_id) {
-    if (! user_id || ! isPrimitive(user_id)) {
+    if (!user_id || !isPrimitive(user_id)) {
       throw new Error('Invalid value for user id');
     }
 
     this.user.user_id = user_id;
 
-    if (! this.session.session_id) {
+    if (!this.session.session_id) {
       const global = getGlobalObject();
       global.sessionStorage.removeItem(SESSION_STORAGE_KEY);
     }
@@ -73,7 +73,7 @@ export default class Context {
    * @return {this}
    */
   setClientIp(client_ip) {
-    if (! client_ip || ! isPrimitive(client_ip)) {
+    if (!client_ip || !isPrimitive(client_ip)) {
       throw new Error('Invalid value for client ip');
     }
 
@@ -96,7 +96,7 @@ export default class Context {
    * @return {void}
    */
   setSessionId(session_id) {
-    if (! session_id || ! isPrimitive(session_id)) {
+    if (!session_id || !isPrimitive(session_id)) {
       throw new Error('Invalid value for session id');
     }
 
@@ -122,11 +122,19 @@ export default class Context {
       }
     }
 
-    const expires_at = new Date(new Date().getTime() + (1000 * SESSION_STORAGE_LIFETIME));
-    const session_id = sha1([...Array(10)].map(_ => (Math.random() * 36|0).toString(36)).join('') + this.user.user_id);
+    const expires_at = new Date(
+      new Date().getTime() + 1000 * SESSION_STORAGE_LIFETIME
+    );
+    const session_id = sha1(
+      [...Array(10)]
+        // eslint-disable-next-line no-unused-vars
+        .map(_ => ((Math.random() * 36) | 0).toString(36))
+        .join('') + this.user.user_id
+    );
 
     global.sessionStorage.setItem(
-      SESSION_STORAGE_KEY, JSON.stringify({expires_at, session_id})
+      SESSION_STORAGE_KEY,
+      JSON.stringify({ expires_at, session_id })
     );
 
     return session_id;
@@ -138,7 +146,7 @@ export default class Context {
    * @return {void}
    */
   setRequestId(request_id) {
-    if (! request_id || ! isPrimitive(request_id)) {
+    if (!request_id || !isPrimitive(request_id)) {
       throw new Error('Invalid value for request id');
     }
 
