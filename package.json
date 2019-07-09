@@ -1,7 +1,7 @@
 {
-  "name": "understand-js-handler",
+  "name": "understand-js",
   "version": "0.0.1",
-  "description": "understand-js-handler",
+  "description": "understand-js",
   "engines": {
     "node": ">=6"
   },
@@ -25,14 +25,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aivis/understand-js-handler.git"
+    "url": "git+https://github.com/understand/understand-js.git"
   },
   "author": "Mettle",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/aivis/understand-js-handler/issues"
+    "url": "https://github.com/understand/understand-js/issues"
   },
-  "homepage": "https://github.com/aivis/understand-js-handler#readme",
+  "homepage": "https://github.com/understand/understand-js#readme",
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
