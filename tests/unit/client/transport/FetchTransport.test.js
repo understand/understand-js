@@ -13,10 +13,10 @@ describe('FetchTransport', () => {
     transport = new FetchTransport('123-456');
 
     // mock fetch Headers
-    window.Headers = function () {
+    window.Headers = function() {
       return {
         append: jest.fn()
-      }
+      };
     };
   });
 
@@ -67,7 +67,8 @@ describe('FetchTransport', () => {
 
     const headers = new Map([['header-key', 'header-value']]);
 
-    return transport.setHeaders(headers)
+    return transport
+      .setHeaders(headers)
       .sendEvent(payload)
       .then(res => {
         expect(mockedFetch.mock.calls.length).toBe(1);

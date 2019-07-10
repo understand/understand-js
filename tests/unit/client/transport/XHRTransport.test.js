@@ -55,8 +55,10 @@ describe('XHRTransport', () => {
 
     const headers = new Map([['header-key', 'header-value']]);
 
-    return transport.setHeaders(headers)
-      .sendEvent(payload).then(res => {
+    return transport
+      .setHeaders(headers)
+      .sendEvent(payload)
+      .then(res => {
         //
       });
   });

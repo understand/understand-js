@@ -25,7 +25,8 @@ export default class FetchTransport extends BaseTransport {
     if (this.headers) {
       const fetchHeaders = new Headers();
 
-      this.headers.forEach(function (value, key, map) {
+      // eslint-disable-next-line no-unused-vars
+      this.headers.forEach(function(value, key, map) {
         fetchHeaders.append(key, value);
       });
 

@@ -9,7 +9,7 @@ export default class TransportHeaderEnhancer {
 
     const autodetect = [];
 
-    if (! event.hasOwnProperty('client_ip')) {
+    if (!event.hasOwnProperty('client_ip')) {
       autodetect.push('client_ip');
     }
 
@@ -19,5 +19,4 @@ export default class TransportHeaderEnhancer {
 
     return headers;
   }
-
 }

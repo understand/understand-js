@@ -6,7 +6,7 @@ const payload = {
   level: 'test'
 };
 
-const mockSetHeaders = jest.fn(function () {
+const mockSetHeaders = jest.fn(function() {
   return this;
 });
 

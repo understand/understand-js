@@ -24,5 +24,5 @@ describe('BaseTransport', () => {
     transport.setHeaders(headers);
 
     expect(transport.getHeaders()).toEqual(headers);
-  })
+  });
 });

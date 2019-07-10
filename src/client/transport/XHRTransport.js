@@ -35,7 +35,8 @@ export default class XHRTransport extends BaseTransport {
         request.open('POST', this.url);
 
         if (this.headers) {
-          this.headers.forEach(function (value, key, map) {
+          // eslint-disable-next-line no-unused-vars
+          this.headers.forEach(function(value, key, map) {
             request.setRequestHeader(key, value);
           });
         }
