@@ -1,6 +1,7 @@
 import Dedupe from 'applicationRoot/Dedupe';
 import Logger from 'applicationRoot/utils/Logger';
 import ConsoleTransport from './transport/ConsoleTransport';
+import TransportHeadersEnhancer from './TransportHeadersEnhancer';
 import { isFunction } from 'applicationRoot/utils/helpers';
 
 export default class BaseClient {
@@ -12,6 +13,7 @@ export default class BaseClient {
     this.options = options;
     this.logger = new Logger();
     this.dedupe = new Dedupe();
+    this.headers = new TransportHeadersEnhancer();
 
     if (!this.options.token) {
       this.logger.warn('No token provided, Client will not do anything.');
@@ -49,6 +51,7 @@ export default class BaseClient {
     }
 
     return this.transport
+      .setHeaders(this.headers.compute(event))
       .sendEvent(event)
       .then(() => {
         this.dedupe.setLastEvent(event);

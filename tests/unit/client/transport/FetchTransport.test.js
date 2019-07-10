@@ -11,6 +11,13 @@ let transport;
 describe('FetchTransport', () => {
   beforeEach(() => {
     transport = new FetchTransport('123-456');
+
+    // mock fetch Headers
+    window.Headers = function () {
+      return {
+        append: jest.fn()
+      }
+    };
   });
 
   test('inherits getEnpoint() implementation', () => {
@@ -49,5 +56,28 @@ describe('FetchTransport', () => {
         referrerPolicy: ''
       });
     });
+  });
+
+  test('it should add headers to the fetch call', () => {
+    const response = { status: 200 };
+
+    const mockedFetch = jest.fn(() => Promise.resolve(response));
+
+    window.fetch = mockedFetch;
+
+    const headers = new Map([['header-key', 'header-value']]);
+
+    return transport.setHeaders(headers)
+      .sendEvent(payload)
+      .then(res => {
+        expect(mockedFetch.mock.calls.length).toBe(1);
+        expect(mockedFetch.mock.calls[0][0]).toBe(url);
+        expect(mockedFetch.mock.calls[0][1]).toMatchObject({
+          body: JSON.stringify(payload),
+          method: 'POST',
+          referrerPolicy: ''
+        });
+        expect(mockedFetch.mock.calls[0][1]).toHaveProperty('headers');
+      });
   });
 });
