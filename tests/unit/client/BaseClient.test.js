@@ -6,6 +6,10 @@ const payload = {
   level: 'test'
 };
 
+const mockSetHeaders = jest.fn(function() {
+  return this;
+});
+
 const mockSendEvent = jest.fn(() => {
   return new Promise((resolve, reject) => resolve());
 });
@@ -13,6 +17,7 @@ const mockSendEvent = jest.fn(() => {
 jest.mock('applicationRoot/client/transport/ConsoleTransport', () => {
   return jest.fn().mockImplementation(() => {
     return {
+      setHeaders: mockSetHeaders,
       sendEvent: mockSendEvent
     };
   });
@@ -21,6 +26,7 @@ jest.mock('applicationRoot/client/transport/ConsoleTransport', () => {
 describe('BaseClient', () => {
   beforeEach(() => {
     ConsoleTransport.mockClear();
+    mockSetHeaders.mockClear();
     mockSendEvent.mockClear();
   });
 
@@ -36,6 +42,7 @@ describe('BaseClient', () => {
 
     return client.sendEvent(payload).then(() => {
       expect(ConsoleTransport.mock.calls.length).toEqual(1);
+      expect(mockSetHeaders).toHaveBeenCalledTimes(1);
       expect(mockSendEvent.mock.calls[0][0]).toEqual(payload);
     });
   });
@@ -64,6 +71,7 @@ describe('BaseClient', () => {
     });
 
     return client.sendEvent(payload).then(() => {
+      expect(mockSetHeaders).toHaveBeenCalledTimes(0);
       expect(mockSendEvent).toHaveBeenCalledTimes(0);
     });
   });

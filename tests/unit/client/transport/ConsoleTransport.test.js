@@ -27,7 +27,7 @@ describe('ConsoleTransport', () => {
 
     return transport.sendEvent(payload).then(() => {
       expect(mockLog).toHaveBeenCalledTimes(1);
-      expect(mockLog).toHaveBeenCalledWith(payload);
+      expect(mockLog).toHaveBeenCalledWith(payload, undefined);
     });
   });
 });

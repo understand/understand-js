@@ -22,6 +22,17 @@ export default class FetchTransport extends BaseTransport {
       referrerPolicy: supportsReferrerPolicy() ? 'origin' : ''
     };
 
+    if (this.headers) {
+      const fetchHeaders = new Headers();
+
+      // eslint-disable-next-line no-unused-vars
+      this.headers.forEach(function(value, key, map) {
+        fetchHeaders.append(key, value);
+      });
+
+      defaultOptions.headers = fetchHeaders;
+    }
+
     return this.buffer.add(
       this.global.fetch(this.url, defaultOptions).then(response => ({
         status: response.status

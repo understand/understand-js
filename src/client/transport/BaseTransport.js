@@ -13,6 +13,8 @@ export default class BaseTransport {
 
     this.buffer = new PromiseBuffer(30);
 
+    this.headers = undefined;
+
     if (token) {
       this.url = new API(token).getEndpoint();
     }
@@ -31,11 +33,31 @@ export default class BaseTransport {
   }
 
   /**
+   * Set the headers for transport
+   * @param {Map} headers
+   */
+  setHeaders(headers) {
+    this.headers = headers;
+
+    return this;
+  }
+
+  /**
+   * Get transport headers
+   * @return {Map}
+   */
+  getHeaders() {
+    return this.headers;
+  }
+
+  /**
    * Close transport
    * @param  {number} timeout
    * @return {Promise}
    */
   close(timeout = null) {
+    this.headers = undefined;
+
     return this.buffer.drain(timeout);
   }
 }

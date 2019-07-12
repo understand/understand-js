@@ -21,7 +21,7 @@ export default class Handler {
     this.disableSourceMaps = options.disableSourceMaps || false;
     this.client = new BrowserClient(options);
     this.logger = new Logger();
-    this.context = new Context();
+    this.context = new Context(options.context);
     this.enhancer = new CodeEnhancer();
 
     this.processors = [new Location(), new UserAgent()];
