@@ -51,21 +51,34 @@ Understand.init({
 
 ```
 Understand.withContext(function (context) {
-    context.setSession({
-        id: '{{ sha1(request()->session()->getId()) }}'
-    });
-
-    context.setUser({
-        id: {{ Auth::id() }},
-        ip_address: '{{ request()->getClientIp() }}'
-    });
+    context.setRequestId('08394443-31d5-4d65-8392-a29d733c498d');
+    context.setSessionId('{{ sha1(request()->session()->getId()) }}');
+    context.setUserId({{ Auth::id() }});
+    context.setClientIp('{{ request()->getClientIp() }}');
 
     // set tags as an array
     context.setTags(['error_log']);
 });
 ```
 
+Alternatively you can provide context as part of initialization options:
+
+```
+Understand.init({
+    env: 'staging',
+    token : 'b6eeab13-72f6-4c35-8452-5e96d3d24f1a',
+    context: {
+      request_id: '08394443-31d5-4d65-8392-a29d733c498d',
+      session_id: '{{ sha1(request()->session()->getId()) }}',
+      user_id: {{ Auth::id() }},
+      client_ip: '{{ request()->getClientIp() }}'
+    }
+});
+```
+
 Note that here we are using `sha1` to hash the session id in order to avoid security concernes.
+
+The handler will take care of providing default values for `request_id` and `session_id`, but you should always use your own values if you want to have more control on how events are grouped.
 
 
 * Send your first message to Understand
@@ -83,6 +96,7 @@ Understand.init({
   env: 'production', // REQUIRED: the environment of your application
   token: '<token>',  // REQUIRED: the Understand token
   beforeSend: (event) => {},  // callback that allows you to modify the event before sending it
+  context: {}        // context object
 }
 ```
 
@@ -149,35 +163,47 @@ Understand.init({
 
 #### Context
 
-`Context` lets you add arbitrary information along with your events. Understand supports 3 types of structured data for context and all their values are optional:
+`Context` lets you add arbitrary information along with your events. Understand supports 3 types of structured data for context and all their values are optional.
+
+Context can be injected using the initialization options:
+
+```
+Understand.init({
+    ...
+    context: {
+      request_id: '<request id>',
+      session_id: '<session id>',
+      user_id: <user id>,
+      client_ip: '<client ip>'
+    }
+});
+```
+
+or using setters:
 
 ##### Session
 
 ```
 Understand.withContext(function (context) {
-  context.setSession({
-    id: '<session identifier>',
-    request_id: '<request identifier>'
-  });
+  context.setRequestId('<request identifier>');
+  context.setSessionId('<session identifier>');
 });
 ```
 
-* `id`: you can optionally send to Understand the id of the HTTP session
 * `request_id`: this value is used by Understand to group multiple errors into the same issue.
+* `session_id`: you can optionally send to Understand the id of the HTTP session
 
 ##### User
 
 ```
 Understand.withContext(function (context) {
-  context.setUser({
-    id: '<user identifier>,
-    ip_address: '<ip address>'
-  });
+  context.setUserId(<user identifier>);
+  context.setClientIp('<ip address>');
 });
 ```
 
-* `id`: the identifier of the logged user
-* `ip_address`: the IP address of the user
+* `user_id`: the identifier of the logged user
+* `client_ip`: the IP address of the user
 
 ##### Tags
 
