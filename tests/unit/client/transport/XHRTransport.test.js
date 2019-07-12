@@ -45,4 +45,21 @@ describe('XHRTransport', () => {
       expect(res.status).toEqual(400);
     });
   });
+
+  test('it should add headers to the XHR', () => {
+    mock.post(transport.url, (req, res) => {
+      expect(req.header('header-key')).toEqual('header-value');
+
+      return res.status(200);
+    });
+
+    const headers = new Map([['header-key', 'header-value']]);
+
+    return transport
+      .setHeaders(headers)
+      .sendEvent(payload)
+      .then(res => {
+        //
+      });
+  });
 });

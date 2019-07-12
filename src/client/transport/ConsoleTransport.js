@@ -20,7 +20,7 @@ export default class ConsoleTransport extends BaseTransport {
   sendEvent(event) {
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
-      this.logger.log(event);
+      this.logger.log(event, this.headers);
 
       resolve();
     });

@@ -33,6 +33,14 @@ export default class XHRTransport extends BaseTransport {
           reject(request);
         };
         request.open('POST', this.url);
+
+        if (this.headers) {
+          // eslint-disable-next-line no-unused-vars
+          this.headers.forEach(function(value, key, map) {
+            request.setRequestHeader(key, value);
+          });
+        }
+
         request.send(JSON.stringify(event));
       })
     );

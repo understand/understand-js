@@ -14,4 +14,15 @@ describe('BaseTransport', () => {
       );
     }
   });
+
+  it('should set headers on the transport class', () => {
+    const transport = new BaseTransport({ token: '123' });
+    const headers = new Map();
+
+    expect(transport.getHeaders()).toEqual(undefined);
+
+    transport.setHeaders(headers);
+
+    expect(transport.getHeaders()).toEqual(headers);
+  });
 });
