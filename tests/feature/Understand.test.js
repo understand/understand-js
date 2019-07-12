@@ -16,6 +16,25 @@ function jsdomExecute(window, done, execute, assertCallback) {
 
 let dom;
 
+// need to mock session storage because we're using an opaque origin,
+// bu adding a testUrl will cause external assets inclusion to fail
+// @see https://github.com/jsdom/jsdom/issues/2383
+const sessionStorageMock = (function() {
+  let store = {};
+
+  return {
+    getItem(key) {
+      return store[key] || null;
+    },
+    setItem(key, value) {
+      store[key] = value.toString();
+    },
+    clear() {
+      store = {};
+    }
+  };
+})();
+
 describe('Understand', () => {
   beforeEach(() => {
     return new Promise((resolve, reject) => {
@@ -23,6 +42,10 @@ describe('Understand', () => {
         runScripts: 'dangerously',
         resources: 'usable'
       }).then(res => {
+        Object.defineProperty(res.window, 'sessionStorage', {
+          value: sessionStorageMock
+        });
+
         // setTimeout is used here for this reason
         // https://github.com/jsdom/jsdom#asynchronous-script-loading
         setTimeout(function() {
@@ -97,7 +120,7 @@ describe('Understand', () => {
   });
 
   describe('window.onerror', () => {
-    it('should catch syntax errors', done => {
+    test('should catch syntax errors', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -114,7 +137,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should catch thrown strings as messages', done => {
+    test('should catch thrown strings as messages', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -131,7 +154,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should catch thrown objects as messages', done => {
+    test('should catch thrown objects as messages', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -148,7 +171,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should capture exceptions inside setTimeout', done => {
+    test('should capture exceptions inside setTimeout', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -167,7 +190,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should capture exceptions inside setInterval', done => {
+    test('should capture exceptions inside setInterval', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -187,7 +210,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should capture exceptions inside requestAnimationFrame', done => {
+    test('should capture exceptions inside requestAnimationFrame', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -206,7 +229,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should capture exceptions from XMLHttpRequest event handlers (e.g. onreadystatechange)', done => {
+    test('should capture exceptions from XMLHttpRequest event handlers (e.g. onreadystatechange)', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -242,7 +265,7 @@ describe('Understand', () => {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event
    */
   describe.skip('window.onunhandledrejection', () => {
-    it('should capture unhandledrejection with error', done => {
+    test('should capture unhandledrejection with error', done => {
       jsdomExecute(
         dom.window,
         done,
@@ -259,7 +282,7 @@ describe('Understand', () => {
       );
     });
 
-    it('should capture unhandledrejection with a string', function(done) {
+    test('should capture unhandledrejection with a string', function(done) {
       jsdomExecute(
         dom.window,
         done,
