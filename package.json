@@ -39,6 +39,7 @@
     "babelrc-rollup": "^3.0.0",
     "core-js": "^3.1.0",
     "eslint": "^5.16.0",
+    "husky": "^3.0.0",
     "jest": "^24.7.1",
     "jest-localstorage-mock": "^2.4.0",
     "jsdom": "^15.0.0",
@@ -61,5 +62,11 @@
     "js-sha1": "^0.6.0",
     "stacktrace-js": "^2.0.0",
     "uuid": "^3.3.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run fix:prettier && npm run fix:eslint",
+      "pre-push": "npm test"
+    }
   }
 }
