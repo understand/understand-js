@@ -44,7 +44,7 @@ const plugins = [
   }),
   license({
     sourcemap: true,
-    banner: `/*! aivis/understand-js-handler <%= pkg.version %> (${commitHash}) | https://github.com/aivis/understand-js-handler */`,
+    banner: `/*! understand/understand-js <%= pkg.version %> (${commitHash}) | https://github.com/understand/understand-js */`,
   }),
   bundleSize()
 ];
