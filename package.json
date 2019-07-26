@@ -1,7 +1,7 @@
 {
-  "name": "understand-js",
+  "name": "@understand/understand-js",
   "version": "1.0.0",
-  "description": "understand-js",
+  "description": "Understand.io JavaScript handler.",
   "engines": {
     "node": ">=6"
   },
