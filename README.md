@@ -62,7 +62,7 @@ throw new Error('Understand.io test error');
 </script>
 ```
 
-## How to Ssend Events
+## How to Send Events
 - If you called the `installErrorHandlers` method or you are using the [framework integration](#framework-support) then all unhandled errors get delivered to Understand.io.
 - Any handled exceptions can be delivered by using the `Understand.captureError(e)` method:
 ```js
