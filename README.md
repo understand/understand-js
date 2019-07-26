@@ -20,13 +20,13 @@ JavaScript notifier for capturing errors in web browsers and reporting to [Under
 Install it using Yarn:
 
 ```
-yarn add understand-js
+yarn add @understand/understand-js
 ```
 
 or Npm:
 
 ```
-npm install understand-js
+npm install @understand/understand-js
 ```
 
 or include the handler from the CDN:
