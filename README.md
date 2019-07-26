@@ -7,9 +7,9 @@ The package provides a full abstraction for Understand.io and provides extra fea
 
 ## Table of Contents
 
-* [Quick start](#quick-start)
-* [How to send events](#how-to-send-events)
-* [Context information](#context-information)
+* [Quick Start](#quick-start)
+* [How to Send Events](#how-to-send-events)
+* [Context Information](#context-information)
 * [Framework Support](#framework-support)
 * [Gotchas](#gotchas)
 * [Browser Support](#browser-support)
@@ -17,7 +17,7 @@ The package provides a full abstraction for Understand.io and provides extra fea
 * [Contributing](#contributing)
 * [License](#license)
 
-## Quick start
+## Quick Start
 
 1) Install it using Npm (or Yarn):
 
@@ -62,7 +62,7 @@ throw new Error('Understand.io test error');
 </script>
 ```
 
-## How to send events
+## How to Ssend Events
 - If you called the `installErrorHandlers` method or you are using the [framework integration](#framework-support) then all unhandled errors get delivered to Understand.io.
 - Any handled exceptions can be delivered by using the `Understand.captureError(e)` method:
 ```js
@@ -77,7 +77,7 @@ try {
 Understand.captureMessage('The user added a new cart item.');
 ```
 
-## Context information
+## Context Information
 
 Define the context information to improve the error quality and simplify the debugging process. Understand.io aggregates errors based on the context information and gives a good insight into how many users are affected, what's the origin of an error and more.
 
@@ -355,8 +355,8 @@ Understand.withContext(function (context) {
 });
 ```
 
-* `request_id`: this value is used by Understand to group multiple errors into the same issue.
-* `session_id`: you can optionally send to Understand the id of the HTTP session
+* `request_id`: this value is used by Understand.io to group multiple errors into the same issue.
+* `session_id`: you can optionally send to Understand.io the id of the HTTP session
 
 ##### User
 
