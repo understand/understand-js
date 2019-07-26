@@ -1,6 +1,6 @@
 {
   "name": "understand-js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "understand-js",
   "engines": {
     "node": ">=6"
@@ -27,8 +27,8 @@
     "type": "git",
     "url": "git+https://github.com/understand/understand-js.git"
   },
-  "author": "Mettle",
-  "license": "ISC",
+  "author": "Understand",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/understand/understand-js/issues"
   },
