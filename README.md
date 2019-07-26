@@ -404,7 +404,7 @@ comment in the minified file to know where to fetch the expanded source. This co
 $ uglifyjs --compress --source-map source.js.map --source-map-root http://<root url> --source-map-url test.js.map --output source.min.js source.js
 ```
 
-The Understand handler will then automatically fetch the source code and source maps by scraping the URLs within the stack trace. However, you can legitimately decide to disable this feature. You can do this using the option `disableSourceMaps` when initializing the handler:
+The library will then automatically fetch the source code and source maps by scraping the URLs within the stack trace. However, you can disable this feature. You can do this using the option `disableSourceMaps: true` when initializing the handler:
 
 ```
 Understand.init({
@@ -444,4 +444,4 @@ npm run build
 
 ### License
 
-[MIT](LICENSE)
+The Understand.io JavaScript library is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
