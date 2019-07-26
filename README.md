@@ -13,7 +13,7 @@ The package provides a full abstraction for Understand.io and provides extra fea
 * [Framework Support](#framework-support)
 * [Gotchas](#gotchas)
 * [Browser Support](#browser-support)
-* [Api](#api)
+* [API](#api)
 * [Contributing](#contributing)
 * [License](#license)
 
