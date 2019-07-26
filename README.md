@@ -114,7 +114,7 @@ Understand.captureMessage('This is my first message');
 
 By default, Angular comes with its own [`ErrorHandler`](https://angular.io/api/core/ErrorHandler) that intercepts all the errors and logs them to the console, preventing the app from crashing. To report errors to Understand you need to create a new class that implements the `ErrorHandler`:
 
-```
+```js
 import { ErrorHandler, Injectable} from '@angular/core';
 
 @Injectable()
@@ -127,7 +127,7 @@ export class UnderstandErrorHandler implements ErrorHandler {
 
 Then we’ll need to tell Angular that it should use our `UnderstandErrorHandler` class when a new client error happens (provide it):
 
-```
+```js
 import {NgModule, ApplicationRef, ErrorHandler} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {UnderstandErrorHandler} from './understand-error-handler';
@@ -152,7 +152,7 @@ export class AppModule {}
 
 If you're using React 16 you can leverage `ErrorBoundary` [components](https://reactjs.org/blog/2017/07/26/error-handling-in-react-16.html) to capture errors inside your render tree.
 
-```
+```js
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -180,7 +180,7 @@ class ErrorBoundary extends React.Component {
 
 Then you can use it as a regular component:
 
-```
+```js
 <ErrorBoundary>
   <MyWidget />
 </ErrorBoundary>
@@ -192,7 +192,7 @@ React 15 and previous versions do not handle errors as nicely as the latest vers
 
 Vue.js offers a [handler](https://vuejs.org/v2/api/#errorHandler) for uncaught errors during component render function and watchers. You can hook into it and report any errors using the Undestand client.
 
-```
+```js
 Vue.config.errorHandler = function (err, vm, info) {
   Understand.captureError(err);
 }
@@ -204,7 +204,7 @@ Vue.config.errorHandler = function (err, vm, info) {
 
 In JavaScript you can throw any type of data that you'd like:
 
-```
+```js
 throw "hello";
 throw { name: "Nicholas" };
 throw true;
@@ -233,7 +233,7 @@ This behavior can be overriden in some browsers using the `crossorigin` attribut
 1. Make sure that your external assets are served with the `Access-Control-Allow-Origin: *` CORS header. Most CDNs are already configured appropriately, but you should apply this change to your hosted assets (for example, if they are provided from a different cookieless domain).
 2. Add the [crossorigin attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_settings_attributes) to your script tag.
 
-```
+```html
 <script src="//cdn.example.com/site.js" crossorigin></script>
 ```
 
@@ -256,7 +256,7 @@ See [https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerro
 
 #### Initialization
 
-```
+```js
 Understand.init({
   env: 'production', // REQUIRED: the environment of your application
   token: '<token>',  // REQUIRED: the Understand token
@@ -269,13 +269,13 @@ Understand.init({
 
 To automatically attach global handlers to capture uncaught exceptions and unhandled rejections you will need to call `installErrorHandlers` after initialization process.
 
-```
+```js
 Understand.installErrorHandlers();
 ```
 
 To optionally enable/disable global handlers you can pass an object to `installErrorHandlers` with the proper boolean values, for example:
 
-```
+```js
 Understand.installErrorHandlers({
   enableWindowError: true,
   enableUnhandledRejection: false
@@ -286,7 +286,7 @@ Understand.installErrorHandlers({
 
 You can pass an [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) object to `captureError()` to get it captured as an event.
 
-```
+```js
 try {
   throw new Error('Oh snap!');
 } catch (e) {
@@ -300,7 +300,7 @@ You can throw a string (or other primitives) as an error, but it would then be t
 
 If you need to send a basic message to Understand you can do so by using the `captureMessage()` method:
 
-```
+```js
 Understand.captureMessage('my message', 'info');
 ```
 
@@ -312,7 +312,7 @@ You can set the severity of a message to one of five values: `fatal`, `error`, `
 
 The Understand handler exposes a `beforeSend(event)` callback which can be used to add/remove information on the event or optionally discard it by returning `null`.
 
-```
+```js
 Understand.init({
   ...
   beforeSend: (event) => {
@@ -332,7 +332,7 @@ Understand.init({
 
 Context can be injected using the initialization options:
 
-```
+```js
 Understand.init({
     ...
     context: {
@@ -348,7 +348,7 @@ or using setters:
 
 ##### Session
 
-```
+```js
 Understand.withContext(function (context) {
   context.setRequestId('<request identifier>');
   context.setSessionId('<session identifier>');
@@ -360,7 +360,7 @@ Understand.withContext(function (context) {
 
 ##### User
 
-```
+```js
 Understand.withContext(function (context) {
   context.setUserId(<user identifier>);
   context.setClientIp('<ip address>');
@@ -374,7 +374,7 @@ Understand.withContext(function (context) {
 
 Tags are an array of strings that can help you categorize events.
 
-```
+```js
 Understand.withContext(function (context) {
   context.setTags(['error_log']);
 });
@@ -382,7 +382,7 @@ Understand.withContext(function (context) {
 
 You can clear the context using the `clear()` method:
 
-```
+```js
 Understand.withContext(function (context) {
   context.clear();
 });
@@ -406,7 +406,7 @@ $ uglifyjs --compress --source-map source.js.map --source-map-root http://<root 
 
 The library will then automatically fetch the source code and source maps by scraping the URLs within the stack trace. However, you can disable this feature. You can do this using the option `disableSourceMaps: true` when initializing the handler:
 
-```
+```js
 Understand.init({
     token : '<token>',
     disableSourceMaps: true
