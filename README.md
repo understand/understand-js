@@ -63,7 +63,7 @@ throw new Error('Understand.io test error');
 ```
 
 ## How to Send Events
-- If you called the `catchErrors` method or you are using the [framework integration](#framework-support) then all unhandled errors get delivered to Understand.io.
+- If you have used the catchErrors() method or you are using the framework integration then all unhandled errors will get automatically sent to Understand.io.
 - Any handled exceptions can be delivered by using the `Understand.logError(e)` method:
 ```js
 try {
@@ -79,7 +79,7 @@ Understand.logMessage('The user added a new cart item.');
 
 ## Context Information
 
-Define the context information to improve the error quality and simplify the debugging process. Understand.io aggregates errors based on the context information and gives a good insight into how many users are affected, what's the origin of an error and more.
+You can define `context` information to send additional information with each error, which can help simplify the debugging process. Understand.io aggregates errors based on the context information and gives excellent insight into how many users are affected, the origin of an error, and more.
 
 ```js
 Understand.init({
@@ -94,13 +94,13 @@ Understand.init({
 });
 ```
 
-- All of the context fields are optional but we suggest to specify them.
-- The `request_id` is optional, but it allows to group errors by it. It means you will be able to see all of the errors that happen within a request.
+- Although the context fields are optional, we recommend that they are specified.
+- The `request_id` is optional, but it will help Understand.io to group errors, which will allow you to easily view all errors that happen within each request.
 - If the `client_ip` value is not specified, Understand.io will automatically attach it based on the incoming request.
-- If the `session_id` is not specified, then the library will maintain the user session for you by utilising the local storage. It's only for the library purpose to group errors together by the `session_id` field.
-- Never send a real session-id but a hashed version (sha1)
+- If the `session_id` is not specified, then the library will maintain the user session for you by utilising local storage. The `session_id` is only used by the the library to group errors.
+- Never send a real `session_id`; only use a hashed version (sha1)
 
-The handler will take care of providing default values for `request_id` and `session_id`, but you should always use your own values if you want to have more control on how events are grouped.
+The handler will take care of providing default values for request_id and session_id, but you can always use your own values if you want to have more control on how events are grouped.
 
 
 Send a test message to see if your configuration is working as expected:
@@ -262,7 +262,7 @@ Understand.init({
   token: '<token>',  // REQUIRED: the Understand token
   beforeSend: (event) => {},  // callback that allows you to modify the event before sending it
   context: {}        // context object
-}
+});
 ```
 
 #### Automatically Capturing Errors
