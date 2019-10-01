@@ -31,14 +31,14 @@ or include the package from the CDN:
 <script src="https://cdn.understand.io/understand-js/v1/bundle.min.js" crossorigin="anonymous"></script>
 ```
 
-2) Initialize the library as soon as possible and call the `installErrorHandlers` method to catch JavaScript errors.
+2) Initialize the library as soon as possible and call the `catchErrors` method to catch JavaScript errors.
 
 ```js
 Understand.init({
     env: 'production', // define environment (production, staging, ...)
     token : 'b6eeab13-72f6-4c35-8452-5e96d3d24f1a' // set the input token from your Understand.io channel
 })
-.installErrorHandlers();
+.catchErrors();
 ```
 
 - See [Framework Support](#quick-start) if you are using a JavaScript framework (Vue.js, React.js, ...).
@@ -55,7 +55,7 @@ Understand.init({
     env: 'production', // define environment (production, staging, ...)
     token : 'b6eeab13-72f6-4c35-8452-5e96d3d24f1a' // set the input token from your Understand.io channel
 })
-.installErrorHandlers();
+.catchErrors();
 
 throw new Error('Understand.io test error');
     
@@ -63,18 +63,18 @@ throw new Error('Understand.io test error');
 ```
 
 ## How to Send Events
-- If you called the `installErrorHandlers` method or you are using the [framework integration](#framework-support) then all unhandled errors get delivered to Understand.io.
-- Any handled exceptions can be delivered by using the `Understand.captureError(e)` method:
+- If you called the `catchErrors` method or you are using the [framework integration](#framework-support) then all unhandled errors get delivered to Understand.io.
+- Any handled exceptions can be delivered by using the `Understand.logError(e)` method:
 ```js
 try {
   throw new Error('Oh snap!');
 } catch (e) {
-  Understand.captureError(e);
+  Understand.logError(e);
 }
 ```
-- Regular events can be delivered by using the `Understand.captureMessage` method:
+- Regular events can be delivered by using the `Understand.logMessage` method:
 ```js
-Understand.captureMessage('The user added a new cart item.');
+Understand.logMessage('The user added a new cart item.');
 ```
 
 ## Context Information
@@ -105,7 +105,7 @@ The handler will take care of providing default values for `request_id` and `ses
 
 Send a test message to see if your configuration is working as expected:
 ```
-Understand.captureMessage('This is my first message');
+Understand.logMessage('This is my first message');
 ```
 
 ### Framework Support
@@ -120,7 +120,7 @@ import { ErrorHandler, Injectable} from '@angular/core';
 @Injectable()
 export class UnderstandErrorHandler implements ErrorHandler {
   handleError(error: Error) {
-    Understand.captureError(error);
+    Understand.logError(error);
   }
 }
 ```
@@ -165,7 +165,7 @@ class ErrorBoundary extends React.Component {
     this.setState({ hasError: true });
 
     // Send error to Understand
-    Understand.captureError(error);
+    Understand.logError(error);
   }
 
   render() {
@@ -194,7 +194,7 @@ Vue.js offers a [handler](https://vuejs.org/v2/api/#errorHandler) for uncaught e
 
 ```js
 Vue.config.errorHandler = function (err, vm, info) {
-  Understand.captureError(err);
+  Understand.logError(err);
 }
 ```
 
@@ -267,16 +267,16 @@ Understand.init({
 
 #### Automatically Capturing Errors
 
-To automatically attach global handlers to capture uncaught exceptions and unhandled rejections you will need to call `installErrorHandlers` after initialization process.
+To automatically attach global handlers to capture uncaught exceptions and unhandled rejections you will need to call `catchErrors` after initialization process.
 
 ```js
-Understand.installErrorHandlers();
+Understand.catchErrors();
 ```
 
-To optionally enable/disable global handlers you can pass an object to `installErrorHandlers` with the proper boolean values, for example:
+To optionally enable/disable global handlers you can pass an object to `catchErrors` with the proper boolean values, for example:
 
 ```js
-Understand.installErrorHandlers({
+Understand.catchErrors({
   enableWindowError: true,
   enableUnhandledRejection: false
 });
@@ -284,13 +284,13 @@ Understand.installErrorHandlers({
 
 #### Capture Exceptions
 
-You can pass an [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) object to `captureError()` to get it captured as an event.
+You can pass an [Error](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) object to `logError()` to get it captured as an event.
 
 ```js
 try {
   throw new Error('Oh snap!');
 } catch (e) {
-  Understand.captureError(e);
+  Understand.logError(e);
 }
 ```
 
@@ -298,10 +298,10 @@ You can throw a string (or other primitives) as an error, but it would then be t
 
 #### Capture Messages
 
-If you need to send a basic message to Understand you can do so by using the `captureMessage()` method:
+If you need to send a basic message to Understand you can do so by using the `logMessage()` method:
 
 ```js
-Understand.captureMessage('my message', 'info');
+Understand.logMessage('my message', 'info');
 ```
 
 You can set the severity of a message to one of five values: `fatal`, `error`, `warning`, `info`, and `debug`. When capturing messages `info` is the default level.
