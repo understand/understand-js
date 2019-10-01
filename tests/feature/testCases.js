@@ -7,7 +7,7 @@ function testErrorString(message) {
   try {
     throw new String(message);
   } catch (e) {
-    Understand.captureError(e);
+    Understand.logError(e);
   }
 }
 

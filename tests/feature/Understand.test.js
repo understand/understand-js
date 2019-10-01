@@ -71,7 +71,7 @@ describe('Understand', () => {
         dom.window,
         done,
         function() {
-          Understand.captureError(new Error('test'));
+          Understand.logError(new Error('test'));
         },
         function(event) {
           expect(event.message).toEqual('test');
