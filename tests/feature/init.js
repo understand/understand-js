@@ -13,4 +13,4 @@ Understand.init({
   }
 });
 
-Understand.installErrorHandlers();
+Understand.catchErrors();

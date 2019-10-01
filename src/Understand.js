@@ -33,7 +33,7 @@ class Understand {
    * @param  {Object} options
    * @return {void}
    */
-  installErrorHandlers(options = {}) {
+  catchErrors(options = {}) {
     const global = getGlobalObject();
 
     if (enabled(options.enableWindowError)) {
@@ -52,7 +52,7 @@ class Understand {
        */
       global.onerror = (message, url, lineNo, columnNo, error) => {
         if (error) {
-          this.captureError(error);
+          this.logError(error);
         } else {
           const stackFrame = new StackFrame({
             args: [],
@@ -78,7 +78,7 @@ class Understand {
       global.onunhandledrejection = e => {
         const err = (e && (e.detail ? e.detail.reason : e.reason)) || e;
 
-        this.captureError(err);
+        this.logError(err);
       };
     }
   }
@@ -88,7 +88,7 @@ class Understand {
    * @param  {Any} e
    * @return {void}
    */
-  captureError(e) {
+  logError(e) {
     // If it is an ErrorEvent with `error` property, extract it to get actual Error
     // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
     if (isErrorEvent(e) && e.error) {
@@ -104,7 +104,7 @@ class Understand {
         domEx.name || (isDOMError(domEx) ? 'DOMError' : 'DOMException');
       const message = domEx.message ? `${name}: ${domEx.message}` : name;
 
-      this.captureMessage(message, Severity.Error);
+      this.logMessage(message, Severity.Error);
     }
     // we have a real Error object
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
@@ -113,7 +113,7 @@ class Understand {
     } else if (isPlainObject(e)) {
       const err = safeStringify(e);
 
-      this.captureMessage(err, Severity.Error);
+      this.logMessage(err, Severity.Error);
     }
     // If none of previous checks were valid, then it means that
     // it's not a DOMError/DOMException
@@ -122,7 +122,7 @@ class Understand {
     // it's not an Error
     // So bail out and capture it as a simple message:
     else {
-      this.captureMessage(e, Severity.Error);
+      this.logMessage(e, Severity.Error);
     }
   }
 
@@ -132,7 +132,7 @@ class Understand {
    * @param  {string} level
    * @return {void}
    */
-  captureMessage(message, level = Severity.Info) {
+  logMessage(message, level = Severity.Info) {
     this.handler.handleMessage(message, level);
   }
 

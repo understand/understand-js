@@ -2,18 +2,18 @@ import understand from './Understand';
 
 const {
   init,
-  installErrorHandlers,
-  captureError,
-  captureMessage,
+  catchErrors,
+  logError,
+  logMessage,
   withContext,
   close
 } = understand;
 
 export {
   init,
-  installErrorHandlers,
-  captureError,
-  captureMessage,
+  catchErrors,
+  logError,
+  logMessage,
   withContext,
   close
 };
