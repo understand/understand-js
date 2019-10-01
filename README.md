@@ -63,7 +63,7 @@ throw new Error('Understand.io test error');
 ```
 
 ## How to Send Events
-- If you have used the catchErrors() method or you are using the framework integration then all unhandled errors will get automatically sent to Understand.io.
+- If you have used the `catchErrors()` method or you are using the framework integration then all unhandled errors will get automatically sent to Understand.io.
 - Any handled exceptions can be delivered by using the `Understand.logError(e)` method:
 ```js
 try {
@@ -98,7 +98,7 @@ Understand.init({
 - The `request_id` is optional, but it will help Understand.io to group errors, which will allow you to easily view all errors that happen within each request.
 - If the `client_ip` value is not specified, Understand.io will automatically attach it based on the incoming request.
 - If the `session_id` is not specified, then the library will maintain the user session for you by utilising local storage. The `session_id` is only used by the the library to group errors.
-- Never send a real `session_id`; only use a hashed version (sha1)
+- Never send a real `session_id`; only use a hashed version (sha1).
 
 The handler will take care of providing default values for request_id and session_id, but you can always use your own values if you want to have more control on how events are grouped.
 
