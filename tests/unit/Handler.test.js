@@ -92,7 +92,7 @@ describe('Handler', () => {
     expect(event).toMatchObject({ message: 'test', env: 'production' });
   });
 
-   test('it should set the env to "production" if not specified', () => {
+  test('it should set the env to "production" if not specified', () => {
     const handler = new Handler({
       token: '123456',
       env: null
