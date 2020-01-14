@@ -42,7 +42,7 @@ Understand.init({
 ```
 
 - See [Framework Support](#quick-start) if you are using a JavaScript framework (Vue.js, React.js, ...).
-- See [Laravel error tracking](https://github.com/understand/understand-laravel5) if you are using the Laravel framework.
+- See [Laravel error tracking](https://www.understand.io/docs/1.0/laravel/js) if you are using the Laravel framework.
 
 
 3) Send your first error
