@@ -45,7 +45,7 @@ export default class Context {
    * @return {this}
    */
   setUserId(user_id) {
-    if (!user_id || !isPrimitive(user_id)) {
+    if (user_id !== null && (!user_id || !isPrimitive(user_id))) {
       throw new Error('Invalid value for user id');
     }
 
@@ -73,7 +73,7 @@ export default class Context {
    * @return {this}
    */
   setClientIp(client_ip) {
-    if (!client_ip || !isPrimitive(client_ip)) {
+    if (client_ip !== null && (!client_ip || !isPrimitive(client_ip))) {
       throw new Error('Invalid value for client ip');
     }
 
@@ -87,7 +87,7 @@ export default class Context {
    * @return {string|undefined}
    */
   getClientIp() {
-    return this.user.client_ip;
+    return this.user.client_ip || null;
   }
 
   /**
@@ -96,7 +96,7 @@ export default class Context {
    * @return {void}
    */
   setSessionId(session_id) {
-    if (!session_id || !isPrimitive(session_id)) {
+    if (session_id !== null && (!session_id || !isPrimitive(session_id))) {
       throw new Error('Invalid value for session id');
     }
 
@@ -146,7 +146,7 @@ export default class Context {
    * @return {void}
    */
   setRequestId(request_id) {
-    if (!request_id || !isPrimitive(request_id)) {
+    if (request_id !== null && (!request_id || !isPrimitive(request_id))) {
       throw new Error('Invalid value for request id');
     }
 

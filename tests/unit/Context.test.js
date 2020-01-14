@@ -13,7 +13,7 @@ describe('Context', () => {
     event = {};
   });
 
-  describe.only('session', () => {
+  describe('session', () => {
     test('it should add session id provided by the user via constructor', () => {
       context = new Context({
         session_id: '123456'
@@ -30,12 +30,24 @@ describe('Context', () => {
       expect(context.getSessionId()).toEqual(session_id);
     });
 
-    test('it should throw an error when setting an invalid value as session id', () => {
-      [null, undefined, NaN, '', 0].forEach(val => {
+    test('it should allow null as a valid value for session id', () => {
+      context.setSessionId(null);
+
+      expect(context.getSessionId()).not.toBeNull();
+    });
+
+    test('it should throw an error when setting a falsy value as session id', () => {
+      [undefined, NaN, '', 0].forEach(val => {
         expect(() => {
           context.setSessionId(val);
         }).toThrow();
       });
+    });
+
+    test('it should throw an error when setting a non-primitive value as session id', () => {
+      expect(() => {
+        context.setSessionId(() => 1);
+      }).toThrow();
     });
 
     test('it should apply the session_id to the event when applying context', () => {
@@ -90,17 +102,29 @@ describe('Context', () => {
     test('it should add request id provided by the user via setter', () => {
       const request_id = '08394443-31d5-4d65-8392-a29d733c498d';
 
-      context.setSessionId(request_id);
+      context.setRequestId(request_id);
 
-      expect(context.getSessionId()).toEqual(request_id);
+      expect(context.getRequestId()).toEqual(request_id);
     });
 
-    test('it should throw an error when setting an invalid value as request id', () => {
-      [null, undefined, NaN, '', 0].forEach(val => {
+    test('it should allow null as a valid value for request id', () => {
+      context.setRequestId(null);
+
+      expect(context.getRequestId()).not.toBeNull();
+    });
+
+    test('it should throw an error when setting a falsy value as request id', () => {
+      [undefined, NaN, '', 0].forEach(val => {
         expect(() => {
           context.setRequestId(val);
         }).toThrow();
       });
+    });
+
+    test('it should throw an error when setting a non-primitive value as request id', () => {
+      expect(() => {
+        context.setRequestId(() => 1);
+      }).toThrow();
     });
 
     test('it should return a default request id value if not provided by the user', () => {
@@ -159,12 +183,25 @@ describe('Context', () => {
       expect(Object.keys(sessionStorage.__STORE__).length).toBe(0);
     });
 
-    test('it should throw an error when setting an invalid value as user id', () => {
-      [null, undefined, NaN, '', 0].forEach(val => {
+    test('it should allow null as a valid value for user id', () => {
+      context.setUserId(null);
+
+      expect(sessionStorage.removeItem).toHaveBeenCalledTimes(1);
+      expect(Object.keys(sessionStorage.__STORE__).length).toBe(0);
+    });
+
+    test('it should throw an error when setting an falsy value as user id', () => {
+      [undefined, NaN, '', 0].forEach(val => {
         expect(() => {
           context.setUserId(val);
         }).toThrow();
       });
+    });
+
+    test('it should throw an error when setting a non-primitive value as user id', () => {
+      expect(() => {
+        context.setUserId(() => 1);
+      }).toThrow();
     });
 
     test('it should add client ip provided by the user via constructor', () => {
@@ -193,12 +230,24 @@ describe('Context', () => {
       });
     });
 
+    test('it should allow null as a valid value for client ip', () => {
+      context.setClientIp(null);
+
+      expect(context.getClientIp()).toBeNull();
+    });
+
     test('it should throw an error when setting an invalid value as client ip', () => {
-      [null, undefined, NaN, '', 0].forEach(val => {
+      [undefined, NaN, '', 0].forEach(val => {
         expect(() => {
           context.setClientIp(val);
         }).toThrow();
       });
+    });
+
+    test('it should throw an error when setting a non-primitive value as client ip', () => {
+      expect(() => {
+        context.setClientIp(() => '192.168.10.10');
+      }).toThrow();
     });
   });
 

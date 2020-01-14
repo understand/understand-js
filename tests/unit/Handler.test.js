@@ -82,6 +82,27 @@ describe('Handler', () => {
     expect(event).not.toHaveProperty('group_id');
   });
 
+  test('it should set the env to "production" if not provided', () => {
+    const handler = new Handler({
+      token: '123456'
+    });
+
+    const event = handler.buildEvent('test', Severity.Info);
+
+    expect(event).toMatchObject({ message: 'test', env: 'production' });
+  });
+
+  test('it should set the env to "production" if not specified', () => {
+    const handler = new Handler({
+      token: '123456',
+      env: null
+    });
+
+    const event = handler.buildEvent('test', Severity.Info);
+
+    expect(event).toMatchObject({ message: 'test', env: 'production' });
+  });
+
   test('it should build the event with stackframes', () => {
     const handler = new Handler({
       token: '123456',

@@ -111,9 +111,7 @@ export default class Handler {
       }
     }
 
-    if (this.options.env) {
-      event.env = this.options.env;
-    }
+    event.env = this.options.env || 'production';
 
     for (let processor of this.processors) {
       event = processor.process(event);
