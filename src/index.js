@@ -9,13 +9,6 @@ const {
   close
 } = understand;
 
-export {
-  init,
-  catchErrors,
-  logError,
-  logMessage,
-  withContext,
-  close
-};
+export { init, catchErrors, logError, logMessage, withContext, close };
 
 export { SDK_NAME, SDK_VERSION } from './version';
