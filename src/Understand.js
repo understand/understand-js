@@ -1,6 +1,7 @@
 'use strict';
 
 import Handler from './Handler';
+import Logger from './utils/Logger';
 import {
   enabled,
   getGlobalObject,
@@ -13,6 +14,8 @@ import {
 } from './utils/helpers';
 import Severity from './utils/Severity';
 import StackFrame from 'stackframe';
+
+const logger = new Logger();
 
 class Understand {
   /**
@@ -34,6 +37,10 @@ class Understand {
    * @return {void}
    */
   catchErrors(options = {}) {
+    if (! this.checkInitialized()) {
+      return;
+    }
+
     const global = getGlobalObject();
 
     if (enabled(options.enableWindowError)) {
@@ -89,6 +96,10 @@ class Understand {
    * @return {void}
    */
   logError(e) {
+    if (! this.checkInitialized()) {
+      return;
+    }
+
     // If it is an ErrorEvent with `error` property, extract it to get actual Error
     // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
     if (isErrorEvent(e) && e.error) {
@@ -133,6 +144,10 @@ class Understand {
    * @return {void}
    */
   logMessage(message, level = Severity.Info) {
+    if (! this.checkInitialized()) {
+      return;
+    }
+
     this.handler.handleMessage(message, level);
   }
 
@@ -142,6 +157,10 @@ class Understand {
    * @return {void}
    */
   withContext(callback) {
+    if (! this.checkInitialized()) {
+      return;
+    }
+
     return callback(this.handler.getContext());
   }
 
@@ -150,7 +169,25 @@ class Understand {
    * @return {void}
    */
   close() {
+    if (! this.checkInitialized()) {
+      return;
+    }
+
     this.handler.close();
+  }
+
+  /**
+   * Check if the component is initialized.
+   * @return {Boolean}
+   */
+  checkInitialized() {
+    if (this.handler) {
+      return true;
+    }
+
+    logger.warn('Understand has not been initialized! Please call init() before submitting errors.');
+
+    return false;
   }
 }
 
