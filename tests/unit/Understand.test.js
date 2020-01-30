@@ -14,6 +14,24 @@ jest.mock('applicationRoot/Handler', () => {
   });
 });
 
+describe('Understand - Preliminary', () => {
+
+  test('it should not throw an error if the component is not initialized', () => {
+    const errorEvent = new ErrorEvent('error event', {
+      error: new Error('error event'),
+      message: 'error message',
+      lineno: 42,
+      filename: 'index.html'
+    });
+
+    expect(() => Understand.catchErrors()).not.toThrow();
+    expect(() => Understand.logError(errorEvent)).not.toThrow();
+    expect(() => Understand.logMessage('my message')).not.toThrow();
+    expect(() => Understand.close()).not.toThrow();
+  });
+
+});
+
 describe('Understand', () => {
   beforeEach(() => {
     Understand.init({
