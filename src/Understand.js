@@ -185,7 +185,7 @@ class Understand {
       return true;
     }
 
-    logger.warn('Understand has not been initialized! Please call init() before submitting errors.');
+    logger.warn('Understand-js has not been initialised with all of the necessary configuration settings. Please call the Understand.init() method as soon as possible after you import the library.');
 
     return false;
   }
