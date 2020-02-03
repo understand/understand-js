@@ -15,7 +15,7 @@
     "build": "rollup --config",
     "build:watch": "rollup --config --watch",
     "link:yarn": "yarn link",
-    "lint": "run-s lint:prettier lint:tslint",
+    "lint": "run-s lint:prettier lint:eslint",
     "lint:prettier": "prettier --check \"{src,tests}/**/*.js\"",
     "lint:eslint": "eslint .",
     "fix": "run-s fix:eslint fix:prettier",

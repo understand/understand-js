@@ -58,7 +58,7 @@ Understand.init({
 .catchErrors();
 
 throw new Error('Understand.io test error');
-    
+
 </script>
 ```
 
@@ -307,6 +307,13 @@ Understand.logMessage('my message', 'info');
 You can set the severity of a message to one of five values: `fatal`, `error`, `warning`, `info`, and `debug`. When capturing messages `info` is the default level.
 
 **Note:** only messages with `fatal` and `error` severity level will show up in the Errors section of Understand's dashboard.
+
+#### Capture Metadata
+
+With `logError` and `logMessage` methods you can also send custom metadata to Understand:
+
+- `logError(e, { foo: 'bar' })`
+- `logMessage('my message', 'info', { foo: 'bar' })`
 
 #### Filter Errors
 
