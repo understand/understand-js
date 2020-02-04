@@ -6,7 +6,7 @@
     "node": ">=6"
   },
   "module": "build/bundle.es6.min.js",
-  "browser": "build/bundle.min.js",
+  "browser": "build/bundle.es6.min.js",
   "main": "build/bundle.es6.min.js",
   "publishConfig": {
     "access": "public"
