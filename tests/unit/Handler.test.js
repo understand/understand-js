@@ -79,6 +79,7 @@ describe('Handler', () => {
     expect(event).toHaveProperty('url');
     expect(event).toHaveProperty('user_agent');
     expect(event).toHaveProperty('level', Severity.Info);
+    expect(event).toHaveProperty('context', {});
     expect(event).not.toHaveProperty('group_id');
   });
 
@@ -145,6 +146,40 @@ describe('Handler', () => {
       expect(event).toMatchObject({ message: 'test', env: 'test' });
       expect(event).toHaveProperty('level', severity);
       expect(event).toHaveProperty('group_id');
+    });
+  });
+
+  test('it should add context metadata to the event if explicitly set', () => {
+    const handler = new Handler({
+      token: '123456',
+      env: 'test'
+    });
+
+    const event = handler.buildEvent('test', Severity.Info, [], {
+      foo: 'bar'
+    });
+
+    expect(event).toMatchObject({
+      message: 'test',
+      env: 'test',
+      context: {
+        foo: 'bar'
+      }
+    });
+  });
+
+  test('it should add empty context metadata to the event if not explicitly set', () => {
+    const handler = new Handler({
+      token: '123456',
+      env: 'test'
+    });
+
+    const event = handler.buildEvent('test', Severity.Info);
+
+    expect(event).toMatchObject({
+      message: 'test',
+      env: 'test',
+      context: {}
     });
   });
 

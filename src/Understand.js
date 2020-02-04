@@ -37,7 +37,7 @@ class Understand {
    * @return {void}
    */
   catchErrors(options = {}) {
-    if (! this.checkInitialized()) {
+    if (!this.checkInitialized()) {
       return;
     }
 
@@ -93,17 +93,18 @@ class Understand {
   /**
    * Manually capture an error.
    * @param  {Any} e
+   * @param  {Object} metadata
    * @return {void}
    */
-  logError(e) {
-    if (! this.checkInitialized()) {
+  logError(e, metadata = {}) {
+    if (!this.checkInitialized()) {
       return;
     }
 
     // If it is an ErrorEvent with `error` property, extract it to get actual Error
     // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
     if (isErrorEvent(e) && e.error) {
-      this.handler.handle(e.message, e.error);
+      this.handler.handle(e.message, e.error, metadata);
     }
     // If it is a DOMError or DOMException (which are legacy APIs, but still supported in some browsers)
     // then we just extract the name and message, as they don't provide anything else
@@ -115,16 +116,16 @@ class Understand {
         domEx.name || (isDOMError(domEx) ? 'DOMError' : 'DOMException');
       const message = domEx.message ? `${name}: ${domEx.message}` : name;
 
-      this.logMessage(message, Severity.Error);
+      this.logMessage(message, Severity.Error, metadata);
     }
     // we have a real Error object
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
     else if (isError(e)) {
-      this.handler.handle(e.message, e);
+      this.handler.handle(e.message, e, metadata);
     } else if (isPlainObject(e)) {
       const err = safeStringify(e);
 
-      this.logMessage(err, Severity.Error);
+      this.logMessage(err, Severity.Error, metadata);
     }
     // If none of previous checks were valid, then it means that
     // it's not a DOMError/DOMException
@@ -133,7 +134,7 @@ class Understand {
     // it's not an Error
     // So bail out and capture it as a simple message:
     else {
-      this.logMessage(e, Severity.Error);
+      this.logMessage(e, Severity.Error, metadata);
     }
   }
 
@@ -141,14 +142,15 @@ class Understand {
    * Capture a message
    * @param  {string} message The message to capture
    * @param  {string} level
+   * @param  {Object} metadata
    * @return {void}
    */
-  logMessage(message, level = Severity.Info) {
-    if (! this.checkInitialized()) {
+  logMessage(message, level = Severity.Info, metadata = {}) {
+    if (!this.checkInitialized()) {
       return;
     }
 
-    this.handler.handleMessage(message, level);
+    this.handler.handleMessage(message, level, [], metadata);
   }
 
   /**
@@ -157,7 +159,7 @@ class Understand {
    * @return {void}
    */
   withContext(callback) {
-    if (! this.checkInitialized()) {
+    if (!this.checkInitialized()) {
       return;
     }
 
@@ -169,7 +171,7 @@ class Understand {
    * @return {void}
    */
   close() {
-    if (! this.checkInitialized()) {
+    if (!this.checkInitialized()) {
       return;
     }
 
@@ -185,7 +187,9 @@ class Understand {
       return true;
     }
 
-    logger.warn('Understand-js has not been initialised with all of the necessary configuration settings. Please call the Understand.init() method as soon as possible after you import the library.');
+    logger.warn(
+      'Understand has not been initialized! Please call init() before submitting errors.'
+    );
 
     return false;
   }

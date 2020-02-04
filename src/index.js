@@ -10,6 +10,14 @@ const {
   checkInitialized
 } = understand;
 
-export { init, catchErrors, logError, logMessage, withContext, close, checkInitialized };
+export {
+  init,
+  catchErrors,
+  logError,
+  logMessage,
+  withContext,
+  close,
+  checkInitialized
+};
 
 export { SDK_NAME, SDK_VERSION } from './version';

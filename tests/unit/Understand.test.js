@@ -15,7 +15,6 @@ jest.mock('applicationRoot/Handler', () => {
 });
 
 describe('Understand - Preliminary', () => {
-
   test('it should not throw an error if the component is not initialized', () => {
     const errorEvent = new ErrorEvent('error event', {
       error: new Error('error event'),
@@ -29,7 +28,6 @@ describe('Understand - Preliminary', () => {
     expect(() => Understand.logMessage('my message')).not.toThrow();
     expect(() => Understand.close()).not.toThrow();
   });
-
 });
 
 describe('Understand', () => {
@@ -53,39 +51,36 @@ describe('Understand', () => {
 
     Understand.logError(errorEvent);
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('error message', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('error message', expect.any(Error), {});
   });
 
   test('it should manually capture a DOMException', () => {
     Understand.logError(new DOMException('dom exception', 'DOM Exception'));
 
-    expect(mockHandleMessage).toBeCalled();
     expect(mockHandleMessage).toBeCalledWith(
       'DOM Exception: dom exception',
-      Severity.Error
+      Severity.Error,
+      [],
+      {}
     );
   });
 
   test('it should manually capture a generic Error', () => {
     Understand.logError(new Error('error'));
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('error', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('error', expect.any(Error), {});
   });
 
   test('it should manually capture an EvalError', () => {
     Understand.logError(new EvalError('EvalError', 'someFile.js', 10));
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('EvalError', expect.any(EvalError));
+    expect(mockHandle).toBeCalledWith('EvalError', expect.any(EvalError), {});
   });
 
   test('it should manually capture a RangeError', () => {
     Understand.logError(new RangeError('RangeError', 'someFile.js', 10));
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('RangeError', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('RangeError', expect.any(Error), {});
   });
 
   test('it should manually capture a ReferenceError', () => {
@@ -93,42 +88,71 @@ describe('Understand', () => {
       new ReferenceError('ReferenceError', 'someFile.js', 10)
     );
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('ReferenceError', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('ReferenceError', expect.any(Error), {});
   });
 
   test('it should manually capture a SyntaxError', () => {
     Understand.logError(new SyntaxError('SyntaxError', 'someFile.js', 10));
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('SyntaxError', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('SyntaxError', expect.any(Error), {});
   });
 
   test('it should manually capture a TypeError', () => {
     Understand.logError(new TypeError('TypeError', 'someFile.js', 10));
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('TypeError', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('TypeError', expect.any(Error), {});
   });
 
   test('it should manually capture a URIError', () => {
     Understand.logError(new URIError('URIError', 'someFile.js', 10));
 
-    expect(mockHandle).toBeCalled();
-    expect(mockHandle).toBeCalledWith('URIError', expect.any(Error));
+    expect(mockHandle).toBeCalledWith('URIError', expect.any(Error), {});
+  });
+
+  test('it should apply metadata when manually capturing an Error', () => {
+    const meta = {
+      foo: 'bar'
+    };
+
+    Understand.logError(new Error('error'), meta);
+
+    expect(mockHandle).toBeCalledWith('error', expect.any(Error), meta);
   });
 
   test('it should manually capture a string', () => {
     Understand.logError('exception');
 
-    expect(mockHandleMessage).toBeCalled();
-    expect(mockHandleMessage).toBeCalledWith('exception', Severity.Error);
+    expect(mockHandleMessage).toBeCalledWith(
+      'exception',
+      Severity.Error,
+      [],
+      {}
+    );
   });
 
   test('it should assign a default `info` level when capturing a message', () => {
     Understand.logMessage('my message');
 
-    expect(mockHandleMessage).toBeCalled();
-    expect(mockHandleMessage).toBeCalledWith('my message', Severity.Info);
+    expect(mockHandleMessage).toBeCalledWith(
+      'my message',
+      Severity.Info,
+      [],
+      {}
+    );
+  });
+
+  test('it should apply metadata when capturing a message', () => {
+    const meta = {
+      foo: 'bar'
+    };
+
+    Understand.logMessage('my message', Severity.Info, meta);
+
+    expect(mockHandleMessage).toBeCalledWith(
+      'my message',
+      Severity.Info,
+      [],
+      meta
+    );
   });
 });

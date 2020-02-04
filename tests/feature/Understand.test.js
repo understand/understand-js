@@ -71,13 +71,18 @@ describe('Understand', () => {
         dom.window,
         done,
         function() {
-          Understand.logError(new Error('test'));
+          Understand.logError(new Error('test'), {
+            foo: 'bar'
+          });
         },
         function(event) {
           expect(event.message).toEqual('test');
           expect(event.file).toEqual(__filename);
           expect(event.level).toEqual('error');
           expect(event.stack.length).toBeTruthy();
+          expect(event.context).toEqual({
+            foo: 'bar'
+          });
 
           done();
         }
@@ -95,6 +100,27 @@ describe('Understand', () => {
           expect(event.message).toEqual('test');
           expect(event.level).toEqual('error');
           expect(event.stack.length).toBeTruthy();
+
+          done();
+        }
+      );
+    });
+
+    test('it should manually capture a message', done => {
+      jsdomExecute(
+        dom.window,
+        done,
+        function() {
+          Understand.logMessage('test', 'info', {
+            foo: 'bar'
+          });
+        },
+        function(event) {
+          expect(event.message).toEqual('test');
+          expect(event.level).toEqual('info');
+          expect(event.context).toEqual({
+            foo: 'bar'
+          });
 
           done();
         }

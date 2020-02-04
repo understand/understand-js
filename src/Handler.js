@@ -5,6 +5,7 @@ import Location from './processors/Location';
 import UserAgent from './processors/UserAgent';
 import Context from './Context';
 import Logger from './utils/Logger';
+import Metadata from './Metadata';
 import Severity from './utils/Severity';
 
 import StackTrace from 'stacktrace-js';
@@ -35,7 +36,7 @@ export default class Handler {
    * @param  {Error}  error
    * @return {Promise}
    */
-  handle(message, error) {
+  handle(message, error, metadata = {}) {
     if (this.closed) {
       return;
     }
@@ -46,7 +47,12 @@ export default class Handler {
     return StackTrace.fromError(error, { offline: true })
       .then(stackframes => {
         if (this.disableSourceMaps) {
-          const event = this.buildEvent(message, Severity.Error, stackframes);
+          const event = this.buildEvent(
+            message,
+            Severity.Error,
+            stackframes,
+            metadata
+          );
 
           return this.client.sendEvent(event);
         }
@@ -57,7 +63,8 @@ export default class Handler {
           const event = this.buildEvent(
             message,
             Severity.Error,
-            enhancedFrames
+            enhancedFrames,
+            metadata
           );
 
           return this.client.sendEvent(event);
@@ -73,9 +80,10 @@ export default class Handler {
    * @param  {String} message
    * @param  {String} level
    * @param  {Array}  stackFrames
+   * @param  {Object} metadata
    * @return {Object}
    */
-  buildEvent(message, level = Severity.Error, stackFrames = []) {
+  buildEvent(message, level = Severity.Error, stackFrames = [], metadata = {}) {
     const frame = stackFrames[0];
 
     let event = {
@@ -117,6 +125,8 @@ export default class Handler {
       event = processor.process(event);
     }
 
+    event = Metadata.applyToEvent(event, metadata);
+
     event = this.context.applyToEvent(event);
 
     return event;
@@ -127,14 +137,15 @@ export default class Handler {
    * @param  {string} message
    * @param  {string} level
    * @param  {Array}  stackFrames
+   * @param  {Object} metadata
    * @return {Promise}
    */
-  handleMessage(message, level, stackFrames = []) {
+  handleMessage(message, level, stackFrames = [], metadata = {}) {
     if (this.closed) {
       return;
     }
 
-    const event = this.buildEvent(message, level, stackFrames);
+    const event = this.buildEvent(message, level, stackFrames, metadata);
 
     return this.client.sendEvent(event);
   }
