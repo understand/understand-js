@@ -22,9 +22,7 @@ const plugins = [
   alias({
     applicationRoot: __dirname + '/src'
   }),
-  resolve({
-    mainFields: ['module', 'main', 'browser']
-  }),
+  resolve(),
   commonjs(),
   babel({
     exclude: 'node_modules/**',
@@ -52,11 +50,11 @@ const plugins = [
 const bundleConfig = {
   input: 'src/index.js',
   output: {
-    format: 'iife',
+    format: 'umd',
     name: 'Understand'
   },
   context: 'window',
-  external: ['babel-polyfill'],
+  external: ['babel-polyfill', 'crypto'],
   plugins: [
     ...plugins,
   ],
@@ -86,7 +84,7 @@ export default [
   {
     input: 'src/Understand.js',
     output: {
-      format: 'cjs',
+      format: 'esm',
       file: 'build/bundle.es6.js',
     },
     plugins: bundleConfig.plugins
@@ -96,10 +94,7 @@ export default [
         presets: [
           [
             '@babel/preset-env', {
-              modules: false,
-              targets: {
-                node: '6.10'
-              }
+              modules: false
             }
           ]
         ]
@@ -109,7 +104,7 @@ export default [
   {
     input: 'src/Understand.js',
     output: {
-      format: 'cjs',
+      format: 'esm',
       sourcemap: true,
       file: 'build/bundle.es6.min.js',
     },
@@ -120,10 +115,7 @@ export default [
         presets: [
           [
             '@babel/preset-env', {
-              modules: false,
-              targets: {
-                node: '6.10'
-              }
+              modules: false
             }
           ]
         ]

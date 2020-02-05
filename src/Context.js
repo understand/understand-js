@@ -1,5 +1,5 @@
 import sha1 from 'js-sha1';
-import uuidv4 from 'uuid/v4';
+import uuid from 'uuid-random';
 import { getGlobalObject, isPrimitive } from 'applicationRoot/utils/helpers';
 
 import DEFAULT_TAGS from 'applicationRoot/utils/DefaultTags';
@@ -158,7 +158,7 @@ export default class Context {
   getRequestId() {
     if (this.session.request_id) return this.session.request_id;
 
-    return uuidv4();
+    return uuid();
   }
 
   /**
