@@ -54,7 +54,7 @@ const bundleConfig = {
     name: 'Understand'
   },
   context: 'window',
-  external: ['babel-polyfill'],
+  external: ['babel-polyfill', 'crypto'],
   plugins: [
     ...plugins,
   ],
