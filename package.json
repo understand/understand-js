@@ -2,12 +2,8 @@
   "name": "@understand/understand-js",
   "version": "1.1.9",
   "description": "Understand.io JavaScript handler.",
-  "engines": {
-    "node": ">=6"
-  },
   "module": "build/bundle.es6.min.js",
-  "browser": "build/bundle.es6.min.js",
-  "main": "build/bundle.es6.min.js",
+  "main": "build/bundle.min.js",
   "publishConfig": {
     "access": "public"
   },
