@@ -206,3 +206,31 @@ export function normalize(key, value, seen) {
 
   return value;
 }
+
+/**
+ * Checks whether given value's type is an regexp
+ *
+ * @param wat A value to be checked.
+ * @returns A boolean representing the result.
+ */
+export function isRegExp(wat) {
+  return Object.prototype.toString.call(wat) === '[object RegExp]';
+}
+
+/**
+ * Checks if the value matches a regex or includes the string
+ *
+ * @param value The string value to be checked against
+ * @param pattern Either a regex or a string that must be contained in value
+ */
+export function matchesPattern(value, pattern) {
+  if (isRegExp(pattern)) {
+    return pattern.test(value);
+  }
+
+  if (typeof pattern === 'string') {
+    return value.indexOf(pattern) !== -1;
+  }
+
+  return false;
+}

@@ -36,7 +36,8 @@ describe('Handler', () => {
 
   test('it should not handle the error if the handler is closed', () => {
     const handler = new Handler({
-      token: '123456'
+      token: '123456',
+      disableSourceMaps: true
     });
 
     handler.close();
@@ -47,7 +48,8 @@ describe('Handler', () => {
 
   test('it should not handle the message if the handler is closed', () => {
     const handler = new Handler({
-      token: '123456'
+      token: '123456',
+      disableSourceMaps: true
     });
 
     handler.close();
@@ -58,7 +60,8 @@ describe('Handler', () => {
 
   test('it should handle the event if the handler is open', () => {
     const handler = new Handler({
-      token: '123456'
+      token: '123456',
+      disableSourceMaps: true
     });
 
     return handler.handle('test', new Error('test')).then(() => {

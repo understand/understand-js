@@ -317,7 +317,45 @@ With `logError` and `logMessage` methods you can also send custom metadata to Un
 
 #### Filter Errors
 
-The Understand handler exposes a `beforeSend(event)` callback which can be used to add/remove information on the event or optionally discard it by returning `null`.
+Given the diversity of browsers and platforms, frontend errors can become very noisy and even, in some cases, bring no additional value to the developers.
+
+With this idea in ming the handler automatically avoids to report all (Script errors)[#script-error] that are not resolved. If you still want to report them you can initialize the handler with the `ignoreScriptErrors` option set to `false`:
+
+```js
+Understand.init({
+    env: 'staging',
+    token : 'b6eeab13-72f6-4c35-8452-5e96d3d24f1a',
+    ignoreScriptErrors: false
+});
+```
+
+Additionally you might want to filter some specific errors that do provide really low value to you as a developer. You can define them as entries in the `ignoredErrors` option. It allows partial matches (using RexExp) and exact matches (using Strings).
+
+```js
+Understand.init({
+    env: 'staging',
+    token : 'b6eeab13-72f6-4c35-8452-5e96d3d24f1a',
+    ignoredErrors: [/ResizeObserver/]
+});
+```
+
+This configuration will prevent sending any error that contains the `ResizeObserver` string.
+
+You can also blacklist specific urls using the `blacklistedUrls` option, so errors that generate from those origins will not be send to Understand. This option allows partial and exact matches, just like `ignoredErrors`.
+
+```js
+Understand.init({
+    env: 'staging',
+    token : 'b6eeab13-72f6-4c35-8452-5e96d3d24f1a',
+    blacklistedUrls: [
+      // Chrome extensions
+      /extensions\//i,
+      /^chrome:\/\//i
+    ]
+});
+```
+
+Finally, for more complex cases, the Understand handler exposes a `beforeSend(event)` callback which can be used to add/remove information on the event or optionally discard it by returning `null`.
 
 ```js
 Understand.init({
