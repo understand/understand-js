@@ -319,7 +319,7 @@ With `logError` and `logMessage` methods you can also send custom metadata to Un
 
 In some situations, you may want to avoid sending specific JS errors to Understand.io. It can be particularly useful if you have well-known errors which you would like to filter at the library level.
 
-By default, the library filter all of the Script errors (Script errors)[#script-error]. You can disable this feature by setting the `ignoreScriptErrors` option set to `false`:
+By default, the library filter all of the Script errors [Script errors](#script-error). You can disable this feature by setting the `ignoreScriptErrors` option set to `false`:
 
 ```js
 Understand.init({
@@ -339,7 +339,7 @@ Understand.init({
 });
 ```
 
-This configuration above prevents sending any errors that contain the `ResizeObserver` string.
+The configuration above prevents sending any errors that contain the `ResizeObserver` string.
 
 You can also blacklist specific URLs using the `blacklistedUrls` option. The errors generated from those origins will not be sent to Understand.io. 
 This option allows partial and exact matches, just like `ignoredErrors`.
