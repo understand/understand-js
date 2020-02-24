@@ -317,9 +317,9 @@ With `logError` and `logMessage` methods you can also send custom metadata to Un
 
 #### Filter Errors
 
-Given the diversity of browsers and platforms, frontend errors can become very noisy and even, in some cases, bring no additional value to the developers.
+In some situations, you may want not to send specific of the JS errors to Understand.io. It can be particularly useful if you have well-known issues which you would like to filter at the library level.
 
-With this idea in ming the handler automatically avoids to report all (Script errors)[#script-error] that are not resolved. If you still want to report them you can initialize the handler with the `ignoreScriptErrors` option set to `false`:
+By default, the library filters the all of Script errors (Script errors)[#script-error]. You can disable this feature by setting the `ignoreScriptErrors` option set to `false`:
 
 ```js
 Understand.init({
@@ -329,7 +329,7 @@ Understand.init({
 });
 ```
 
-Additionally you might want to filter some specific errors that do provide really low value to you as a developer. You can define them as entries in the `ignoredErrors` option. It allows partial matches (using RexExp) and exact matches (using Strings).
+Additionally, you might want to filter some specific errors. You can define them as entries in the `ignoredErrors` option. It allows partial matches (using RexExp) and exact matches (using Strings):
 
 ```js
 Understand.init({
@@ -339,9 +339,10 @@ Understand.init({
 });
 ```
 
-This configuration will prevent sending any error that contains the `ResizeObserver` string.
+This configuration above prevents sending any errors that contain the `ResizeObserver` string.
 
-You can also blacklist specific urls using the `blacklistedUrls` option, so errors that generate from those origins will not be send to Understand. This option allows partial and exact matches, just like `ignoredErrors`.
+You can also blacklist specific URLs using the `blacklistedUrls` option. The errors generated from those origins will not be sent to Understand.io. 
+This option allows partial and exact matches, just like `ignoredErrors`.
 
 ```js
 Understand.init({
@@ -355,7 +356,7 @@ Understand.init({
 });
 ```
 
-Finally, for more complex cases, the Understand handler exposes a `beforeSend(event)` callback which can be used to add/remove information on the event or optionally discard it by returning `null`.
+For more complex situations, the library allows to extend the `beforeSend(event)` callback which can be used to adjust the event data or optionally discard it by returning `null`:
 
 ```js
 Understand.init({
