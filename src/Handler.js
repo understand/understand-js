@@ -4,6 +4,7 @@ import CodeEnhancer from './CodeEnhancer';
 import Location from './processors/Location';
 import UserAgent from './processors/UserAgent';
 import Context from './Context';
+import Filters from './Filters';
 import Logger from './utils/Logger';
 import Metadata from './Metadata';
 import Severity from './utils/Severity';
@@ -24,6 +25,7 @@ export default class Handler {
     this.logger = new Logger();
     this.context = new Context(options.context);
     this.enhancer = new CodeEnhancer();
+    this.filters = new Filters(options);
 
     this.processors = [new Location(), new UserAgent()];
 
@@ -54,6 +56,10 @@ export default class Handler {
             metadata
           );
 
+          if (this.filters.ignoreEvent(event)) {
+            return;
+          }
+
           return this.client.sendEvent(event);
         }
 
@@ -66,6 +72,10 @@ export default class Handler {
             enhancedFrames,
             metadata
           );
+
+          if (this.filters.ignoreEvent(event)) {
+            return;
+          }
 
           return this.client.sendEvent(event);
         });
@@ -147,7 +157,28 @@ export default class Handler {
 
     const event = this.buildEvent(message, level, stackFrames, metadata);
 
+    if (this.filters.ignoreEvent(event)) {
+      return;
+    }
+
     return this.client.sendEvent(event);
+  }
+
+  /**
+   * Temporarily ignore filters.
+   * @param  {Function} callback
+   * @return {any}
+   */
+  withoutFilters(callback) {
+    const options = this.filters.getOptions();
+
+    this.filters.clear();
+
+    try {
+      return callback();
+    } finally {
+      this.filters.setOptions(options);
+    }
   }
 
   /**

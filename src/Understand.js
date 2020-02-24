@@ -15,8 +15,6 @@ import {
 import Severity from './utils/Severity';
 import StackFrame from 'stackframe';
 
-const logger = new Logger();
-
 class Understand {
   /**
    * Init the main class
@@ -27,6 +25,8 @@ class Understand {
     this.options = options;
 
     this.handler = new Handler(options);
+
+    this.logger = new Logger();
 
     return this;
   }
@@ -104,7 +104,7 @@ class Understand {
     // If it is an ErrorEvent with `error` property, extract it to get actual Error
     // https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
     if (isErrorEvent(e) && e.error) {
-      this.handler.handle(e.message, e.error, metadata);
+      return this.handler.handle(e.message, e.error, metadata);
     }
     // If it is a DOMError or DOMException (which are legacy APIs, but still supported in some browsers)
     // then we just extract the name and message, as they don't provide anything else
@@ -116,16 +116,16 @@ class Understand {
         domEx.name || (isDOMError(domEx) ? 'DOMError' : 'DOMException');
       const message = domEx.message ? `${name}: ${domEx.message}` : name;
 
-      this.logMessage(message, Severity.Error, metadata);
+      return this.handler.handleMessage(message, Severity.Error, [], metadata);
     }
     // we have a real Error object
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
     else if (isError(e)) {
-      this.handler.handle(e.message, e, metadata);
+      return this.handler.handle(e.message, e, metadata);
     } else if (isPlainObject(e)) {
       const err = safeStringify(e);
 
-      this.logMessage(err, Severity.Error, metadata);
+      return this.handler.handleMessage(err, Severity.Error, [], metadata);
     }
     // If none of previous checks were valid, then it means that
     // it's not a DOMError/DOMException
@@ -134,7 +134,7 @@ class Understand {
     // it's not an Error
     // So bail out and capture it as a simple message:
     else {
-      this.logMessage(e, Severity.Error, metadata);
+      return this.handler.handleMessage(e, Severity.Error, [], metadata);
     }
   }
 
@@ -150,7 +150,9 @@ class Understand {
       return;
     }
 
-    this.handler.handleMessage(message, level, [], metadata);
+    return this.handler.withoutFilters(() => {
+      return this.handler.handleMessage(message, level, [], metadata);
+    });
   }
 
   /**
@@ -187,7 +189,7 @@ class Understand {
       return true;
     }
 
-    logger.warn(
+    this.logger.warn(
       'Understand has not been initialized! Please call init() before submitting errors.'
     );
 

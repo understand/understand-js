@@ -1,328 +1,494 @@
-/* eslint-disable */
-import { JSDOM } from 'jsdom';
+import Severity from 'applicationRoot/utils/Severity';
+import Understand from 'applicationRoot/Understand';
+import Logger from 'applicationRoot/utils/Logger';
 
-function jsdomExecute(window, done, execute, assertCallback) {
-  window.finish = function(event) {
-    try {
-      assertCallback(event);
-    } catch (e) {
-      done(e);
-    }
-  };
+const mockLog = jest.fn();
+const mockWarn = jest.fn();
 
-  // use setTimeout so stack trace doesn't go all the way back to Jest test runner
-  window.eval('window.setTimeout.call(window, ' + execute.toString() + ');');
-}
-
-let dom;
-
-// need to mock session storage because we're using an opaque origin,
-// bu adding a testUrl will cause external assets inclusion to fail
-// @see https://github.com/jsdom/jsdom/issues/2383
-const sessionStorageMock = (function() {
-  let store = {};
-
-  return {
-    getItem(key) {
-      return store[key] || null;
-    },
-    setItem(key, value) {
-      store[key] = value.toString();
-    },
-    clear() {
-      store = {};
-    }
-  };
-})();
+jest.mock('applicationRoot/utils/Logger', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      log: mockLog,
+      warn: mockWarn
+    };
+  });
+});
 
 describe('Understand', () => {
   beforeEach(() => {
-    return new Promise((resolve, reject) => {
-      JSDOM.fromFile(__dirname + '/iframe.html', {
-        runScripts: 'dangerously',
-        resources: 'usable'
-      }).then(res => {
-        Object.defineProperty(res.window, 'sessionStorage', {
-          value: sessionStorageMock
-        });
-
-        // setTimeout is used here for this reason
-        // https://github.com/jsdom/jsdom#asynchronous-script-loading
-        setTimeout(function() {
-          if (res.window.Understand) {
-            dom = res;
-
-            resolve(res);
-          } else {
-            reject();
-          }
-        }, 1000);
-      });
-    });
+    mockLog.mockClear();
+    mockWarn.mockClear();
   });
 
-  afterEach(function() {
-    dom = null;
+  test('initializing the component without token should fallback to console transport', () => {
+    initialize();
+
+    expect(mockWarn).toHaveBeenCalledTimes(1);
   });
 
   describe('API', () => {
-    test('it should manually capture the error', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          Understand.logError(new Error('test'), {
-            foo: 'bar'
-          });
-        },
-        function(event) {
-          expect(event.message).toEqual('test');
-          expect(event.file).toEqual(__filename);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
-          expect(event.context).toEqual({
-            foo: 'bar'
-          });
+    describe('logError', () => {
+      test('it should manually capture an Error', async () => {
+        initialize();
 
-          done();
-        }
-      );
+        await Understand.logError(new Error('test error'));
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            args: [],
+            col: expect.any(Number),
+            context: {},
+            env: 'testing',
+            file: expect.stringMatching(/Understand.test.js/),
+            group_id: expect.any(String),
+            level: Severity.Error,
+            line: expect.any(Number),
+            message: 'test error',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            stack: expect.any(Array),
+            tags: ['js_error_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture an Error with metadata', async () => {
+        initialize();
+
+        await Understand.logError(new Error('test error'), {
+          foo: 'bar'
+        });
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            args: [],
+            col: expect.any(Number),
+            context: {
+              foo: 'bar'
+            },
+            env: 'testing',
+            file: expect.stringMatching(/Understand.test.js/),
+            group_id: expect.any(String),
+            level: Severity.Error,
+            line: expect.any(Number),
+            message: 'test error',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            stack: expect.any(Array),
+            tags: ['js_error_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture an Error with context information', async () => {
+        initialize({
+          context: {
+            request_id: '08394443-31d5-4d65-8392-a29d733c498d',
+            session_id: '7b52009b64fd0a2a49e6d8a939753077792b0554',
+            user_id: 12,
+            client_ip: '141.93.46.10'
+          }
+        });
+
+        await Understand.logError(new Error('test error'));
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            args: [],
+            client_ip: '141.93.46.10',
+            col: expect.any(Number),
+            context: {},
+            env: 'testing',
+            file: expect.stringMatching(/Understand.test.js/),
+            group_id: expect.any(String),
+            level: Severity.Error,
+            line: expect.any(Number),
+            message: 'test error',
+            method: 'GET',
+            request_id: '08394443-31d5-4d65-8392-a29d733c498d',
+            session_id: '7b52009b64fd0a2a49e6d8a939753077792b0554',
+            stack: expect.any(Array),
+            tags: ['js_error_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String),
+            user_id: 12
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture an ErrorEvent', async () => {
+        initialize();
+
+        const errorEvent = new ErrorEvent('error event', {
+          error: new Error('error event'),
+          message: 'error message',
+          lineno: 42,
+          filename: 'index.html'
+        });
+
+        await Understand.logError(errorEvent);
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            args: [],
+            col: expect.any(Number),
+            context: {},
+            env: 'testing',
+            file: expect.stringMatching(/Understand.test.js/),
+            group_id: expect.any(String),
+            level: Severity.Error,
+            line: expect.any(Number),
+            message: 'error message',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            stack: expect.any(Array),
+            tags: ['js_error_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a DOMException', async () => {
+        initialize();
+
+        await Understand.logError(
+          new DOMException('dom exception', 'DOM Exception')
+        );
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            context: {},
+            env: 'testing',
+            level: Severity.Error,
+            message: 'DOM Exception: dom exception',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            tags: ['js_error_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture an EvalError', async () => {
+        initialize();
+
+        await Understand.logError(
+          new EvalError('EvalError', 'someFile.js', 10)
+        );
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            env: 'testing',
+            group_id: expect.any(String),
+            level: Severity.Error,
+            message: 'EvalError'
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a RangeError', async () => {
+        initialize();
+
+        await Understand.logError(
+          new RangeError('RangeError', 'someFile.js', 10)
+        );
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            env: 'testing',
+            group_id: expect.any(String),
+            level: Severity.Error,
+            message: 'RangeError'
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a ReferenceError', async () => {
+        initialize();
+
+        await Understand.logError(
+          new ReferenceError('ReferenceError', 'someFile.js', 10)
+        );
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            env: 'testing',
+            group_id: expect.any(String),
+            level: Severity.Error,
+            message: 'ReferenceError'
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a SyntaxError', async () => {
+        initialize();
+
+        await Understand.logError(
+          new SyntaxError('SyntaxError', 'someFile.js', 10)
+        );
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            env: 'testing',
+            group_id: expect.any(String),
+            level: Severity.Error,
+            message: 'SyntaxError'
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a TypeError', async () => {
+        initialize();
+
+        await Understand.logError(
+          new TypeError('TypeError', 'someFile.js', 10)
+        );
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            env: 'testing',
+            group_id: expect.any(String),
+            level: Severity.Error,
+            message: 'TypeError'
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a URIError', async () => {
+        initialize();
+
+        await Understand.logError(new URIError('URIError', 'someFile.js', 10));
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            group_id: expect.any(String),
+            level: Severity.Error,
+            message: 'URIError'
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should manually capture a string as an Error', () => {
+        initialize();
+
+        Understand.logError('exception');
+
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            context: {},
+            env: 'testing',
+            level: Severity.Error,
+            message: 'exception',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            tags: ['js_error_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
+
+      test('it should filter an Error if filteredErrors is set', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          ignoredErrors: [/ResizeObserver/]
+        });
+
+        await Understand.logError(
+          new Error('ResizeObserver loop limit exceeded')
+        );
+
+        expect(mockLog).not.toHaveBeenCalled();
+      });
+
+      test('it should filter an Error if blacklistedUrls is set', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          blacklistedUrls: [/http:\/\/*/]
+        });
+
+        await Understand.logError(new Error('test error'));
+
+        expect(mockLog).not.toHaveBeenCalled();
+      });
+
+      test('it should filter the error using beforeSend', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          beforeSend: event => {
+            return null;
+          }
+        });
+
+        await Understand.logError(new Error('test error'));
+
+        expect(mockLog).not.toHaveBeenCalled();
+      });
     });
 
-    test('it should automatically capture the error', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          testWindowOnError('test');
-        },
-        function(event) {
-          expect(event.message).toEqual('test');
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
+    describe('logMessage', () => {
+      test('it should manually capture a message', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true
+        });
 
-          done();
-        }
-      );
-    });
+        await Understand.logMessage('test message');
 
-    test('it should manually capture a message', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          Understand.logMessage('test', 'info', {
-            foo: 'bar'
-          });
-        },
-        function(event) {
-          expect(event.message).toEqual('test');
-          expect(event.level).toEqual('info');
-          expect(event.context).toEqual({
-            foo: 'bar'
-          });
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            context: {},
+            env: 'testing',
+            level: Severity.Info,
+            message: 'test message',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            tags: ['js_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
 
-          done();
-        }
-      );
-    });
+      test('it should manually capture a message with metadata', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true
+        });
 
-    test('it should catch a string exception as a message', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          testErrorString('test');
-        },
-        function(event) {
-          expect(event.message).toEqual('test');
-          expect(event.level).toEqual('error');
-          expect(event.stack).toBeFalsy();
+        await Understand.logMessage('test message', Severity.Info, {
+          foo: 'bar'
+        });
 
-          done();
-        }
-      );
-    });
-  });
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            context: {
+              foo: 'bar'
+            },
+            env: 'testing',
+            level: Severity.Info,
+            message: 'test message',
+            method: 'GET',
+            request_id: expect.any(String),
+            session_id: expect.any(String),
+            tags: ['js_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String)
+          }),
+          expect.any(Map)
+        );
+      });
 
-  describe('window.onerror', () => {
-    test('should catch syntax errors', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          eval('foo{};');
-        },
-        function(event) {
-          expect(event.message).toMatch(/Unexpected token {/);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
+      test('it should manually capture a message with context information', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          context: {
+            request_id: '08394443-31d5-4d65-8392-a29d733c498d',
+            session_id: '7b52009b64fd0a2a49e6d8a939753077792b0554',
+            user_id: 12,
+            client_ip: '141.93.46.10'
+          }
+        });
 
-          done();
-        }
-      );
-    });
+        await Understand.logMessage('test message');
 
-    test('should catch thrown strings as messages', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          eval('throw "boo";');
-        },
-        function(event) {
-          expect(event.message).toMatch(/boo/);
-          expect(event.level).toEqual('error');
-          expect(event.stack).toBeFalsy();
+        expect(mockLog).toBeCalledWith(
+          expect.objectContaining({
+            client_ip: '141.93.46.10',
+            context: {},
+            env: 'testing',
+            level: Severity.Info,
+            message: 'test message',
+            method: 'GET',
+            request_id: '08394443-31d5-4d65-8392-a29d733c498d',
+            session_id: '7b52009b64fd0a2a49e6d8a939753077792b0554',
+            tags: ['js_log'],
+            url: 'http://localhost/',
+            user_agent: expect.any(String),
+            user_id: 12
+          }),
+          expect.any(Map)
+        );
+      });
 
-          done();
-        }
-      );
-    });
+      test('it should not filter a message if filteredErrors is set', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          ignoredErrors: [/ResizeObserver/]
+        });
 
-    test('should catch thrown objects as messages', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          eval('throw { foo: "bar" };');
-        },
-        function(event) {
-          expect(event.message).toMatch(JSON.stringify({ foo: 'bar' }));
-          expect(event.level).toEqual('error');
-          expect(event.stack).toBeFalsy();
+        await Understand.logMessage('ResizeObserver loop limit exceeded');
 
-          done();
-        }
-      );
-    });
+        expect(mockLog).toHaveBeenCalledTimes(1);
+      });
 
-    test('should capture exceptions inside setTimeout', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          setTimeout(function() {
-            foo();
-          });
-        },
-        function(event) {
-          expect(event.message).toMatch(/foo is not defined/);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
+      test('it should not filter a message if blacklistedUrls is set', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          blacklistedUrls: [/http:\/\/*/]
+        });
 
-          done();
-        }
-      );
-    });
+        await Understand.logMessage('test message');
 
-    test('should capture exceptions inside setInterval', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          var exceptionInterval = setInterval(function() {
-            clearInterval(exceptionInterval);
-            foo();
-          }, 10);
-        },
-        function(event) {
-          expect(event.message).toMatch(/foo is not defined/);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
+        expect(mockLog).toHaveBeenCalledTimes(1);
+      });
 
-          done();
-        }
-      );
-    });
+      test('it should filter a message using beforeSend', async () => {
+        Understand.init({
+          env: 'testing',
+          disableSourceMaps: true,
+          beforeSend: event => {
+            return null;
+          }
+        });
 
-    test('should capture exceptions inside requestAnimationFrame', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          requestAnimationFrame(function() {
-            foo();
-          });
-        },
-        function(event) {
-          expect(event.message).toMatch(/foo is not defined/);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
+        await Understand.logMessage('test message');
 
-          done();
-        }
-      );
-    });
-
-    test('should capture exceptions from XMLHttpRequest event handlers (e.g. onreadystatechange)', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          var xhr = new XMLHttpRequest();
-
-          // intentionally assign event handlers *after* XMLHttpRequest.prototype.open,
-          // since this is what jQuery does
-          // https://github.com/jquery/jquery/blob/master/src/ajax/xhr.js#L37
-
-          xhr.open('GET', 'example.json');
-          xhr.onreadystatechange = function() {
-            // replace onreadystatechange with no-op so exception doesn't
-            // fire more than once as XHR changes loading state
-            xhr.onreadystatechange = function() {};
-            foo();
-          };
-          xhr.send();
-        },
-        function(event) {
-          expect(event.message).toMatch(/foo is not defined/);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
-
-          done();
-        }
-      );
-    });
-  });
-
-  /**
-   * Apparently onunhandledrejection is implemented only on Chrome
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/unhandledrejection_event
-   */
-  describe.skip('window.onunhandledrejection', () => {
-    test('should capture unhandledrejection with error', done => {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          Promise.reject(new Error('test'));
-        },
-        function(event) {
-          expect(event.message).toMatch(/test/);
-          expect(event.level).toEqual('error');
-          expect(event.stack.length).toBeTruthy();
-
-          done();
-        }
-      );
-    });
-
-    test('should capture unhandledrejection with a string', function(done) {
-      jsdomExecute(
-        dom.window,
-        done,
-        function() {
-          Promise.reject('test');
-        },
-        function(event) {
-          expect(event.message).toMatch(/test/);
-          expect(event.level).toEqual('error');
-          expect(event.stack).toBeFalsy();
-
-          done();
-        }
-      );
+        expect(mockLog).not.toHaveBeenCalled();
+      });
     });
   });
 });
+
+function initialize(overrides = {}) {
+  Understand.init(
+    Object.assign(
+      {
+        env: 'testing',
+        disableSourceMaps: true
+      },
+      overrides
+    )
+  );
+}
