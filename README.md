@@ -317,9 +317,9 @@ With `logError` and `logMessage` methods you can also send custom metadata to Un
 
 #### Filter Errors
 
-In some situations, you may want not to send specific of the JS errors to Understand.io. It can be particularly useful if you have well-known issues which you would like to filter at the library level.
+In some situations, you may want to avoid sending specific JS errors to Understand.io. It can be particularly useful if you have well-known errors which you would like to filter at the library level.
 
-By default, the library filters the all of Script errors (Script errors)[#script-error]. You can disable this feature by setting the `ignoreScriptErrors` option set to `false`:
+By default, the library filter all of the Script errors (Script errors)[#script-error]. You can disable this feature by setting the `ignoreScriptErrors` option set to `false`:
 
 ```js
 Understand.init({
