@@ -1,20 +1,22 @@
+import Logger from 'applicationRoot/utils/Logger';
 import Severity from 'applicationRoot/utils/Severity';
 import Understand from 'applicationRoot/Understand';
-import Logger from 'applicationRoot/utils/Logger';
+
+jest.mock('applicationRoot/utils/Logger');
 
 const mockLog = jest.fn();
 const mockWarn = jest.fn();
 
-jest.mock('applicationRoot/utils/Logger', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      log: mockLog,
-      warn: mockWarn
-    };
-  });
-});
-
 describe('Understand', () => {
+  beforeAll(() => {
+    Logger.mockImplementation(() => {
+      return {
+        log: mockLog,
+        warn: mockWarn
+      };
+    });
+  });
+
   beforeEach(() => {
     mockLog.mockClear();
     mockWarn.mockClear();
