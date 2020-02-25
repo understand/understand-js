@@ -15,6 +15,8 @@ import {
 import Severity from './utils/Severity';
 import StackFrame from 'stackframe';
 
+const logger = new Logger();
+
 class Understand {
   /**
    * Init the main class
@@ -25,8 +27,6 @@ class Understand {
     this.options = options;
 
     this.handler = new Handler(options);
-
-    this.logger = new Logger();
 
     return this;
   }
@@ -189,7 +189,7 @@ class Understand {
       return true;
     }
 
-    this.logger.warn(
+    logger.warn(
       'Understand has not been initialized! Please call init() before submitting errors.'
     );
 
