@@ -1,6 +1,9 @@
 # JavaScript error tracking for Understand.io
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![npm downloads](https://img.shields.io/npm/dt/@understand/understand-js)](https://www.npmjs.com/package/@understand/understand-js)
+[![npm version](https://img.shields.io/npm/v/@understand/understand-js)](https://www.npmjs.com/package/@understand/understand-js)
+[![license](https://img.shields.io/npm/l/@understand/understand-js)](https://www.npmjs.com/package/@understand/understand-js)
 
 ## Introduction
 The package provides a full abstraction for Understand.io and provides extra features to improve JavaScript default logging capabilities. It's capable of delivering JavaScript errors and events in the right format to [Understand.io](https://www.understand.io).
