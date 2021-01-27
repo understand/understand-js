@@ -154,7 +154,7 @@ describe('Understand', () => {
           eval('foo{};');
         },
         function(event) {
-          expect(event.message).toMatch(/Unexpected token {/);
+          expect(event.message).toMatch(/Unexpected token '{'/);
           expect(event.level).toEqual('error');
           expect(event.stack.length).toBeTruthy();
 
