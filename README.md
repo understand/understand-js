@@ -4,6 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dt/@understand/understand-js)](https://www.npmjs.com/package/@understand/understand-js)
 [![npm version](https://img.shields.io/npm/v/@understand/understand-js)](https://www.npmjs.com/package/@understand/understand-js)
 [![license](https://img.shields.io/npm/l/@understand/understand-js)](https://www.npmjs.com/package/@understand/understand-js)
+[![tests](https://github.com/understand/understand-js/workflows/Test/badge.svg)](https://github.com/understand/understand-js)
 
 ## Introduction
 The package provides a full abstraction for Understand.io and provides extra features to improve JavaScript default logging capabilities. It's capable of delivering JavaScript errors and events in the right format to [Understand.io](https://www.understand.io).
@@ -244,6 +245,23 @@ Loading assets with CORS is [not supported](https://developer.mozilla.org/en-US/
 
 See [https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#Notes](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#Notes) for more information.
 
+#### Source Maps not expanded
+
+If your errors in Understand are not showing the full stack trace and they point to the minified assets instead, you probably have an issue with source maps.
+
+If you're serving your assets (and source maps) of your application from a different domain, make sure that the server is sending the appropriate [CORS](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) HTTP response headers, otherwise the UnderstandJS tracker will not be able to instrument the stack trace of your errors with the original source file references.
+
+For example, if your assets are served from [AWS CloudFront](https://aws.amazon.com/cloudfront) to your app domain, you will have to do the following:
+
+1. add the `crossorigin` attribute on the dependencies
+
+```html
+<script src="https://xxxxxxxxxxxxx.cloudfront.net/app.js" crossorigin="anonymous"></script>
+```
+
+2. if your file are hosted in S3, you have to configure CORS on the bucket. See https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html for more information
+3. you can check if the response headers are being sent by requesting the dependencies directly from S3. When you're sure that CORS headers are configured correctly, you can configure CloudFront to forward them. See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/header-caching.html for more information.
+
 ### Browser Support
 
 * Chrome: 20+
@@ -344,7 +362,7 @@ Understand.init({
 
 The configuration above prevents sending any errors that contain the `ResizeObserver` string.
 
-You can also blacklist specific URLs using the `blacklistedUrls` option. The errors generated from those origins will not be sent to Understand.io. 
+You can also blacklist specific URLs using the `blacklistedUrls` option. The errors generated from those origins will not be sent to Understand.io.
 This option allows partial and exact matches, just like `ignoredErrors`.
 
 ```js
