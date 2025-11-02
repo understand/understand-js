@@ -88,6 +88,33 @@ class Understand {
         this.logError(err);
       };
     }
+
+    // Capture console.error messages
+    if (enabled(options.enableConsoleError)) {
+      const originalConsoleError = global.console && global.console.error ? global.console.error : () => {};
+      const self = this;
+
+      if (global.console) {
+        global.console.error = function (...args) {
+          // Call the original console.error
+          originalConsoleError.apply(console, args);
+
+          // Join message args into one string
+          const message = args.map(a => {
+            if (a instanceof Error) return a.stack || a.message;
+            try {
+              return typeof a === 'object' ? JSON.stringify(a) : String(a);
+            } catch {
+              return String(a);
+            }
+          }).join(' ');
+
+          // Send to Understand
+          self.handler.handleMessage(message, Severity.Error, []);
+        };
+      }
+    }
+
   }
 
   /**
