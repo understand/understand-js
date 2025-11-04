@@ -129,8 +129,7 @@ class Understand {
       return;
     }
 
-    // Capture console messages
-    // Note: log, warn, info, debug only works with native javascript, react & vue.js
+    // Capture console messages log, warn, info, debug
     if (
       enabled(options.enableConsoleLog) ||
       enabled(options.enableConsoleWarn) ||
@@ -140,13 +139,23 @@ class Understand {
       const globalObj = getGlobalObject();
       const self = this;
 
-      if (globalObj.console) {
-        const patchConsoleMethod = (methodName, type, sourceName) => {
-          const originalMethod = globalObj.console[methodName] || function() {};
+      // Detect and use Angular's Zone.js console if available
+      const zoneConsole =
+        globalObj.Zone && globalObj.Zone.__symbol__
+          ? globalObj[globalObj.Zone.__symbol__('console')] || globalObj.console
+          : globalObj.console;
 
-          globalObj.console[methodName] = function() {
+      const consoleObj = zoneConsole || globalObj.console;
+
+      if (consoleObj) {
+        const patchConsoleMethod = (methodName, type, sourceName) => {
+          const originalMethod = consoleObj[methodName] || function() {};
+
+          consoleObj[methodName] = function() {
             const args = Array.prototype.slice.call(arguments);
-            originalMethod.apply(console, args);
+
+            // Keep original behavior
+            originalMethod.apply(consoleObj, args);
 
             try {
               const message = args
@@ -162,7 +171,7 @@ class Understand {
                 })
                 .join(' ');
 
-              // info, warn, debug, log
+              // Log to Understand
               self.logMessage(message, type, { source: sourceName });
             } catch (err) {
               originalMethod('Understand console hook failed:', err);
