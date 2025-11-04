@@ -10,11 +10,11 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 12
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/node_modules
           key: ${{ runner.os }}-${{ github.sha }}
@@ -28,11 +28,11 @@ jobs:
     needs: job_lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 12
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/node_modules
           key: ${{ runner.os }}-${{ github.sha }}

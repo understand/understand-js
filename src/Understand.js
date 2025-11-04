@@ -88,6 +88,98 @@ class Understand {
         this.logError(err);
       };
     }
+
+    // Capture console error
+    if (enabled(options.enableConsoleError)) {
+      const globalObj = getGlobalObject();
+      const self = this;
+
+      if (globalObj.console) {
+        const originalError = globalObj.console.error || function() {};
+
+        globalObj.console.error = function(...args) {
+          originalError.apply(globalObj.console, args);
+
+          try {
+            // Convert all arguments to a single string
+            const message = args
+              .map(a =>
+                a instanceof Error ? a.stack || a.message : JSON.stringify(a)
+              )
+              .join(' ');
+
+            // Send to Understand handler
+            const err = new Error(message);
+            self.handler.handle(err.message, err, { source: 'console.error' });
+          } catch (err) {
+            originalError('Understand console hook failed:', err);
+          }
+        };
+      }
+    }
+  }
+
+  /**
+   * Install global console log handlers
+   * @param  {Object} options
+   * @return {void}
+   */
+  patchConsoleLogs(options = {}) {
+    if (!this.checkInitialized()) {
+      return;
+    }
+
+    // Capture console messages
+    // Note: log, warn, info, debug only works with native javascript, react & vue.js
+    if (
+      enabled(options.enableConsoleLog) ||
+      enabled(options.enableConsoleWarn) ||
+      enabled(options.enableConsoleInfo) ||
+      enabled(options.enableConsoleDebug)
+    ) {
+      const globalObj = getGlobalObject();
+      const self = this;
+
+      if (globalObj.console) {
+        const patchConsoleMethod = (methodName, type, sourceName) => {
+          const originalMethod = globalObj.console[methodName] || function() {};
+
+          globalObj.console[methodName] = function() {
+            const args = Array.prototype.slice.call(arguments);
+            originalMethod.apply(console, args);
+
+            try {
+              const message = args
+                .map(a => {
+                  if (a instanceof Error) return a.stack || a.message;
+                  try {
+                    return typeof a === 'object'
+                      ? JSON.stringify(a)
+                      : String(a);
+                  } catch (err) {
+                    return String(a);
+                  }
+                })
+                .join(' ');
+
+              // info, warn, debug, log
+              self.logMessage(message, type, { source: sourceName });
+            } catch (err) {
+              originalMethod('Understand console hook failed:', err);
+            }
+          };
+        };
+
+        if (enabled(options.enableConsoleLog))
+          patchConsoleMethod('log', Severity.Log, 'console.log');
+        if (enabled(options.enableConsoleWarn))
+          patchConsoleMethod('warn', Severity.Warning, 'console.warn');
+        if (enabled(options.enableConsoleInfo))
+          patchConsoleMethod('info', Severity.Info, 'console.info');
+        if (enabled(options.enableConsoleDebug))
+          patchConsoleMethod('debug', Severity.Debug, 'console.debug');
+      }
+    }
   }
 
   /**

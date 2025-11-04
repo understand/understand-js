@@ -3,6 +3,7 @@ import understand from './Understand';
 const {
   init,
   catchErrors,
+  patchConsoleLogs,
   logError,
   logMessage,
   withContext,
@@ -13,6 +14,7 @@ const {
 export {
   init,
   catchErrors,
+  patchConsoleLogs,
   logError,
   logMessage,
   withContext,
