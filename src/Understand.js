@@ -149,9 +149,9 @@ class Understand {
 
       if (consoleObj) {
         const patchConsoleMethod = (methodName, type, sourceName) => {
-          const originalMethod = consoleObj[methodName] || function () {};
+          const originalMethod = consoleObj[methodName] || function() {};
 
-          consoleObj[methodName] = function () {
+          consoleObj[methodName] = function() {
             const args = Array.prototype.slice.call(arguments);
 
             // Keep original behavior
@@ -162,7 +162,9 @@ class Understand {
                 .map(a => {
                   if (a instanceof Error) return a.stack || a.message;
                   try {
-                    return typeof a === 'object' ? JSON.stringify(a) : String(a);
+                    return typeof a === 'object'
+                      ? JSON.stringify(a)
+                      : String(a);
                   } catch (err) {
                     return String(a);
                   }
