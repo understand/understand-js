@@ -80,6 +80,33 @@ try {
 ```js
 Understand.logMessage('The user added a new cart item.');
 ```
+## Console Log Support (New)
+Understand.io now allows capturing console messages automatically: ``log``, ``info``, ``warn``, ``debug``, and ``error``
+
+```js
+Understand.catchErrors({
+  enableConsoleError: true
+});
+
+Understand.patchConsoleLogs({
+  enableConsoleLog: true,
+  enableConsoleInfo: true,
+  enableConsoleWarn: true,
+  enableConsoleDebug: true
+});
+```
+- All messages captured via the console are sent to Understand.io as structured events.
+- You can still use ``logMessage`` and ``logError`` manually; console patching is just an enhancement.
+
+### Example:
+```js
+console.log('User clicked a button'); // captured as "log" level
+console.info('App initialized');       // captured as "info" level
+console.warn('Deprecated API call');  // captured as "warn" level
+console.debug('Value of x:', 42);     // captured as "debug" level
+console.error('Something went wrong'); // captured as "error" level
+```
+- You can disable specific console types by setting the corresponding flag to ``false``.
 
 ## Context Information
 
