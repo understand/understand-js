@@ -16,6 +16,12 @@ declare module "@understand/understand-js" {
     enableConsoleDebug?: boolean;
   }
 
+  /** Options for capturing process-level stdout/stderr logs. */
+  export interface CaptureStdoutOptions {
+    enableStdout?: boolean;
+    enableStderr?: boolean;
+  }
+
   export interface Metadata {
     [key: string]: any;
   }
@@ -49,6 +55,15 @@ declare module "@understand/understand-js" {
     init(options: UnderstandOptions): this;
     catchErrors(options?: CatchErrorOptions): void;
     patchConsoleLogs(options?: PatchConsoleOptions): void;
+
+    /** 
+     * Capture all process-level standard output (stdout) and error (stderr) streams.
+     * 
+     * This allows capturing logs emitted by third-party logging libraries (e.g., Winston, Pino, Bunyan)
+     * or any code that writes directly to process.stdout or process.stderr.
+     */
+    captureStdout(options?: CaptureStdoutOptions): void;
+
     logError(e: any, metadata?: Metadata): void;
     logMessage(
       message: string,

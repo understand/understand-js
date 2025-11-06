@@ -255,6 +255,59 @@ class Understand {
       return this.handler.handleMessage(message, level, [], metadata);
     });
   }
+  
+  /**
+   * Capture all process-level standard output (stdout) and error (stderr) streams.
+   * 
+   * This allows capturing logs emitted by third-party logging libraries (e.g., Winston, Pino, Bunyan)
+   * or any code that writes directly to process.stdout or process.stderr.
+   *
+   * @param  {Object} options
+   * @param  {boolean} [options.enableStdout=false] Enable capturing of standard output logs.
+   * @param  {boolean} [options.enableStderr=false] Enable capturing of standard error logs.
+   * @return {void}
+   */
+  captureStdout(options = {}) {
+    if (!this.checkInitialized()) {
+      return;
+    }
+
+    const self = this;
+    const originalStdoutWrite = process.stdout.write.bind(process.stdout);
+    const originalStderrWrite = process.stderr.write.bind(process.stderr);
+
+    // Capture standard output
+    if (enabled(options.enableStdout)) {
+      process.stdout.write = function(chunk, encoding, callback) {
+        try {
+          const message = chunk.toString('utf8').trim();
+          if (message) {
+            self.logMessage(message, Severity.Info, { source: 'stdout' });
+          }
+        } catch (err) {
+          originalStderrWrite(`Understand stdout hook failed: ${err}\n`);
+        }
+
+        return originalStdoutWrite(chunk, encoding, callback);
+      };
+    }
+
+    // Capture standard error
+    if (enabled(options.enableStderr)) {
+      process.stderr.write = function(chunk, encoding, callback) {
+        try {
+          const message = chunk.toString('utf8').trim();
+          if (message) {
+            self.logMessage(message, Severity.Error, { source: 'stderr' });
+          }
+        } catch (err) {
+          originalStderrWrite(`Understand stderr hook failed: ${err}\n`);
+        }
+
+        return originalStderrWrite(chunk, encoding, callback);
+      };
+    }
+  }
 
   /**
    * Manipulate the context for the events
