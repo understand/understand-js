@@ -4,14 +4,6 @@
   "description": "Understand.io JavaScript handler.",
   "module": "build/bundle.es6.min.js",
   "main": "build/bundle.min.js",
-  "types": "src/types/understand-js.d.ts",
-  "exports": {
-    ".": {
-      "import": "./build/bundle.es6.min.js",
-      "require": "./build/bundle.min.js",
-      "types": "./src/types/understand-js.d.ts"
-    }
-  },
   "publishConfig": {
     "access": "public"
   },
