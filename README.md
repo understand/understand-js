@@ -66,6 +66,29 @@ throw new Error('Understand.io test error');
 </script>
 ```
 
+## TypeScript Support
+As of the latest release, TypeScript support is now available via a dedicated type definitions package.
+
+Install the type definitions along with the main package:
+
+```
+npm install @understand/understand-js @types/understand__understand-js
+```
+You can also continue to use the global instance if preferred:
+```ts
+Understand.init({
+  env: "production",
+  token: "token"
+}).catchErrors();
+```
+
+The ``@types/understand__understand-js`` package provides TypeScript interfaces for:
+- UnderstandOptions
+- CatchErrorOptions
+- PatchConsoleOptions
+
+This ensures strong typing and autocompletion for IDEs like VS Code.
+
 ## How to Send Events
 - If you have used the `catchErrors()` method or you are using the framework integration then all unhandled errors will get automatically sent to Understand.io.
 - Any handled exceptions can be delivered by using the `Understand.logError(e)` method:
