@@ -1,6 +1,6 @@
 {
   "name": "@understand/understand-js",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Understand.io JavaScript handler.",
   "module": "build/bundle.es6.min.js",
   "main": "build/bundle.min.js",
