@@ -129,64 +129,98 @@ class Understand {
       return;
     }
 
-    // Capture console messages log, warn, info, debug
+    // Only patch if any console logging is enabled
     if (
       enabled(options.enableConsoleLog) ||
       enabled(options.enableConsoleWarn) ||
       enabled(options.enableConsoleInfo) ||
-      enabled(options.enableConsoleDebug)
+      enabled(options.enableConsoleDebug) ||
+      enabled(options.enableConsoleError)
     ) {
-      const globalObj = getGlobalObject();
       const self = this;
 
-      // Detect and use Angular's Zone.js console if available
-      const zoneConsole =
-        globalObj.Zone && globalObj.Zone.__symbol__
+      // Detect global object
+      var globalObj;
+      if (typeof window !== 'undefined') {
+        globalObj = window;
+      } else if (typeof global !== 'undefined') {
+        globalObj = global;
+      } else if (typeof self !== 'undefined') {
+        globalObj = self;
+      } else {
+        globalObj = {};
+      }
+
+      // Detect Node.js
+      var isNode =
+        typeof process !== 'undefined' &&
+        process.versions &&
+        process.versions.node;
+
+      // Angular Zone.js console (browser only)
+      var zoneConsole =
+        !isNode &&
+        globalObj.Zone &&
+        globalObj.Zone.__symbol__
           ? globalObj[globalObj.Zone.__symbol__('console')] || globalObj.console
-          : globalObj.console;
+          : null;
 
-      const consoleObj = zoneConsole || globalObj.console;
+      var consoleObj = zoneConsole || globalObj.console;
+      if (!consoleObj) return;
 
-      if (consoleObj) {
-        const patchConsoleMethod = (methodName, type, sourceName) => {
-          const originalMethod = consoleObj[methodName] || function() {};
+      // Patch a console method
+      var patchConsoleMethod = function (methodName, type, sourceName) {
+        var originalMethod = consoleObj[methodName];
+        if (typeof originalMethod !== 'function') return;
 
-          consoleObj[methodName] = function() {
-            const args = Array.prototype.slice.call(arguments);
+        consoleObj[methodName] = function () {
+          var args = Array.prototype.slice.call(arguments);
 
-            // Keep original behavior
-            originalMethod.apply(consoleObj, args);
+          // Call original console first
+          originalMethod.apply(consoleObj, args);
 
-            try {
-              const message = args
-                .map(a => {
-                  if (a instanceof Error) return a.stack || a.message;
-                  try {
-                    return typeof a === 'object'
-                      ? JSON.stringify(a)
-                      : String(a);
-                  } catch (err) {
-                    return String(a);
-                  }
-                })
-                .join(' ');
-
-              // Log to Understand
-              self.logMessage(message, type, { source: sourceName });
-            } catch (err) {
-              originalMethod('Understand console hook failed:', err);
+          try {
+            // console.error with Error objects
+            if (methodName === 'error' && args[0] instanceof Error) {
+              return self.logError(args[0]);
             }
-          };
-        };
 
-        if (enabled(options.enableConsoleLog))
-          patchConsoleMethod('log', Severity.Log, 'console.log');
-        if (enabled(options.enableConsoleWarn))
-          patchConsoleMethod('warn', Severity.Warning, 'console.warn');
-        if (enabled(options.enableConsoleInfo))
-          patchConsoleMethod('info', Severity.Info, 'console.info');
-        if (enabled(options.enableConsoleDebug))
-          patchConsoleMethod('debug', Severity.Debug, 'console.debug');
+            // Convert all arguments to string
+            var message = args
+              .map(function (a) {
+                if (a instanceof Error) return a.stack || a.message;
+                if (typeof a === 'object') {
+                  try {
+                    return JSON.stringify(a);
+                  } catch (e) {
+                    return '[Circular]';
+                  }
+                }
+                return String(a);
+              })
+              .join(' ');
+
+            // Log message to Understand
+            self.logMessage(message, type, { source: sourceName });
+          } catch (err) {
+            originalMethod('Understand console hook failed:', err);
+          }
+        };
+      };
+
+      // Patch standard console methods
+      if (enabled(options.enableConsoleLog))
+        patchConsoleMethod('log', Severity.Log, 'console.log');
+      if (enabled(options.enableConsoleWarn))
+        patchConsoleMethod('warn', Severity.Warning, 'console.warn');
+      if (enabled(options.enableConsoleInfo))
+        patchConsoleMethod('info', Severity.Info, 'console.info');
+      if (enabled(options.enableConsoleDebug))
+        patchConsoleMethod('debug', Severity.Debug, 'console.debug');
+
+      // patch console.error in Node and optionally browser
+      if (isNode || enabled(options.enableConsoleError)) {
+        patchConsoleMethod('error', Severity.Error, 'console.error');
       }
     }
   }
@@ -255,6 +289,38 @@ class Understand {
       return this.handler.handleMessage(message, level, [], metadata);
     });
   }
+//   logMessage(msgOrError, level = Severity.Info, metadata = {}) {
+//   if (!this.checkInitialized()) return;
+
+//   // Convert unknown object to string
+//   let message = '';
+//   let stackFrames = [];
+
+//   if (isError(msgOrError)) {
+//     message = msgOrError.message;
+//     stackFrames = StackTrace.fromErrorSync
+//       ? [StackTrace.fromErrorSync(msgOrError)]
+//       : [];
+//   } else {
+//     message = msgOrError != null ? String(msgOrError) : '';
+//     // attach pseudo stack frame for console logs
+//     stackFrames = [
+//       {
+//         getFileName: () => '(console)',
+//         getLineNumber: () => 0,
+//         getColumnNumber: () => 0,
+//         getFunctionName: () => '(console)',
+//         code: null,
+//         getArgs: () => []
+//       }
+//     ];
+//   }
+
+//   return this.handler.withoutFilters(() => {
+//     return this.handler.handleMessage(message, level, stackFrames, metadata);
+//   });
+// }
+
 
   /**
    * Manipulate the context for the events

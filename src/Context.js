@@ -53,7 +53,26 @@ export default class Context {
 
     if (!this.session.session_id) {
       const global = getGlobalObject();
-      global.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+
+      const hasSessionStorage =
+        typeof global !== 'undefined' &&
+        global.sessionStorage &&
+        typeof global.sessionStorage.removeItem === 'function';
+
+      // Node.js fallback
+      if (!this._nodeSessionStore) {
+        this._nodeSessionStore = {};
+      }
+
+      const storage = hasSessionStorage
+        ? global.sessionStorage
+        : {
+            removeItem: key => {
+              delete this._nodeSessionStore[key];
+            }
+          };
+
+      storage.removeItem(SESSION_STORAGE_KEY);
     }
 
     return this;
@@ -114,25 +133,51 @@ export default class Context {
 
     const global = getGlobalObject();
 
-    if (global.sessionStorage.getItem(SESSION_STORAGE_KEY)) {
-      const item = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY));
+    // Browser-safe check
+    const hasSessionStorage =
+      typeof global !== 'undefined' &&
+      global.sessionStorage &&
+      typeof global.sessionStorage.getItem === 'function';
 
-      if (Date.parse(item.expires_at) > new Date()) {
+    // Node.js fallback
+    if (!this._nodeSessionStore) {
+      this._nodeSessionStore = {};
+    }
+
+    const storage = hasSessionStorage
+      ? global.sessionStorage
+      : {
+          getItem: key => this._nodeSessionStore[key] || null,
+          setItem: (key, value) => {
+            this._nodeSessionStore[key] = value;
+          },
+          removeItem: key => {
+            delete this._nodeSessionStore[key];
+          }
+        };
+
+    const stored = storage.getItem(SESSION_STORAGE_KEY);
+    if (stored) {
+      const item = JSON.parse(stored);
+
+      if (Date.parse(item.expires_at) > Date.now()) {
         return item.session_id;
       }
     }
 
     const expires_at = new Date(
-      new Date().getTime() + 1000 * SESSION_STORAGE_LIFETIME
+      Date.now() + 1000 * SESSION_STORAGE_LIFETIME
     );
+
     const session_id = sha1(
       [...Array(10)]
-        // eslint-disable-next-line no-unused-vars
-        .map(_ => ((Math.random() * 36) | 0).toString(36))
+        .map(function () {
+          return ((Math.random() * 36) | 0).toString(36);
+        })
         .join('') + this.user.user_id
     );
 
-    global.sessionStorage.setItem(
+    storage.setItem(
       SESSION_STORAGE_KEY,
       JSON.stringify({ expires_at, session_id })
     );
@@ -191,7 +236,26 @@ export default class Context {
     this.user = {};
 
     const global = getGlobalObject();
-    global.sessionStorage.removeItem(SESSION_STORAGE_KEY);
+
+    const hasSessionStorage =
+      typeof global !== 'undefined' &&
+      global.sessionStorage &&
+      typeof global.sessionStorage.removeItem === 'function';
+
+    // Node.js fallback
+    if (!this._nodeSessionStore) {
+      this._nodeSessionStore = {};
+    }
+
+    const storage = hasSessionStorage
+      ? global.sessionStorage
+      : {
+          removeItem: key => {
+            delete this._nodeSessionStore[key];
+          }
+        };
+
+    storage.removeItem(SESSION_STORAGE_KEY);
 
     return this;
   }
