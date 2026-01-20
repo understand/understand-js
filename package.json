@@ -4,11 +4,15 @@
   "description": "Understand.io JavaScript handler.",
   "module": "build/bundle.es6.min.js",
   "main": "build/bundle.min.js",
+  "types": "build/understand-js.d.ts",
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "build/**/*"
+  ],
   "scripts": {
-    "build": "rollup --config",
+    "build": "rollup --config && cp src/types/understand-js.d.ts build/",
     "build:watch": "rollup --config --watch",
     "link:yarn": "yarn link",
     "lint": "run-s lint:prettier lint:eslint",
