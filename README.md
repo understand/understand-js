@@ -9,6 +9,8 @@
 ## Introduction
 The package provides a full abstraction for Understand.io and provides extra features to improve JavaScript default logging capabilities. It's capable of delivering JavaScript errors and events in the right format to [Understand.io](https://www.understand.io).
 
+It now supports both browser and Node.js environments.
+
 ## Table of Contents
 
 * [Quick Start](#quick-start)
@@ -65,7 +67,6 @@ throw new Error('Understand.io test error');
 
 </script>
 ```
-
 ## TypeScript Support
 As of the latest release, TypeScript support is now available via a dedicated type definitions package.
 
@@ -88,6 +89,42 @@ The ``@types/understand__understand-js`` package provides TypeScript interfaces 
 - PatchConsoleOptions
 
 This ensures strong typing and autocompletion for IDEs like VS Code.
+
+
+## Node.js Support
+The @understand/understand-js package can now track errors and events in Node.js applications.
+
+```
+// Node.js example
+const Understand = require('@understand/understand-js');
+
+Understand.init({
+  env: 'production',
+  token: '<token>'
+})
+.catchErrors();
+
+// Example server-side error
+try {
+  throw new Error('Node.js test error');
+} catch (e) {
+  Understand.logError(e);
+}
+
+// Logging messages
+Understand.logMessage('Server started successfully', 'info');
+
+// Console messages
+Understand.patchConsoleLogs();
+console.log('User clicked a button'); // captured as "log" level
+console.info('App initialized');       // captured as "info" level
+console.warn('Deprecated API call');  // captured as "warn" level
+console.debug('Value of x:', 42);     // captured as "debug" level
+console.error('Something went wrong'); // captured as "error" level
+
+```
+
+Supports all context, metadata, and console patching features available in the browser version.
 
 ## How to Send Events
 - If you have used the `catchErrors()` method or you are using the framework integration then all unhandled errors will get automatically sent to Understand.io.
