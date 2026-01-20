@@ -41,7 +41,7 @@ export default class XHRTransport extends BaseTransport {
           request.open('POST', this.url, true);
 
           if (this.headers) {
-            this.headers.forEach(function (value, key) {
+            this.headers.forEach(function(value, key) {
               request.setRequestHeader(key, value);
             });
           }
@@ -55,7 +55,7 @@ export default class XHRTransport extends BaseTransport {
           const headers = {};
 
           if (this.headers) {
-            this.headers.forEach(function (value, key) {
+            this.headers.forEach(function(value, key) {
               headers[key] = value;
             });
           }

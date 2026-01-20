@@ -159,9 +159,7 @@ class Understand {
 
       // Angular Zone.js console (browser only)
       var zoneConsole =
-        !isNode &&
-        globalObj.Zone &&
-        globalObj.Zone.__symbol__
+        !isNode && globalObj.Zone && globalObj.Zone.__symbol__
           ? globalObj[globalObj.Zone.__symbol__('console')] || globalObj.console
           : null;
 
@@ -169,11 +167,11 @@ class Understand {
       if (!consoleObj) return;
 
       // Patch a console method
-      var patchConsoleMethod = function (methodName, type, sourceName) {
+      var patchConsoleMethod = function(methodName, type, sourceName) {
         var originalMethod = consoleObj[methodName];
         if (typeof originalMethod !== 'function') return;
 
-        consoleObj[methodName] = function () {
+        consoleObj[methodName] = function() {
           var args = Array.prototype.slice.call(arguments);
 
           // Call original console first
@@ -187,7 +185,7 @@ class Understand {
 
             // Convert all arguments to string
             var message = args
-              .map(function (a) {
+              .map(function(a) {
                 if (a instanceof Error) return a.stack || a.message;
                 if (typeof a === 'object') {
                   try {
@@ -289,38 +287,37 @@ class Understand {
       return this.handler.handleMessage(message, level, [], metadata);
     });
   }
-//   logMessage(msgOrError, level = Severity.Info, metadata = {}) {
-//   if (!this.checkInitialized()) return;
+  //   logMessage(msgOrError, level = Severity.Info, metadata = {}) {
+  //   if (!this.checkInitialized()) return;
 
-//   // Convert unknown object to string
-//   let message = '';
-//   let stackFrames = [];
+  //   // Convert unknown object to string
+  //   let message = '';
+  //   let stackFrames = [];
 
-//   if (isError(msgOrError)) {
-//     message = msgOrError.message;
-//     stackFrames = StackTrace.fromErrorSync
-//       ? [StackTrace.fromErrorSync(msgOrError)]
-//       : [];
-//   } else {
-//     message = msgOrError != null ? String(msgOrError) : '';
-//     // attach pseudo stack frame for console logs
-//     stackFrames = [
-//       {
-//         getFileName: () => '(console)',
-//         getLineNumber: () => 0,
-//         getColumnNumber: () => 0,
-//         getFunctionName: () => '(console)',
-//         code: null,
-//         getArgs: () => []
-//       }
-//     ];
-//   }
+  //   if (isError(msgOrError)) {
+  //     message = msgOrError.message;
+  //     stackFrames = StackTrace.fromErrorSync
+  //       ? [StackTrace.fromErrorSync(msgOrError)]
+  //       : [];
+  //   } else {
+  //     message = msgOrError != null ? String(msgOrError) : '';
+  //     // attach pseudo stack frame for console logs
+  //     stackFrames = [
+  //       {
+  //         getFileName: () => '(console)',
+  //         getLineNumber: () => 0,
+  //         getColumnNumber: () => 0,
+  //         getFunctionName: () => '(console)',
+  //         code: null,
+  //         getArgs: () => []
+  //       }
+  //     ];
+  //   }
 
-//   return this.handler.withoutFilters(() => {
-//     return this.handler.handleMessage(message, level, stackFrames, metadata);
-//   });
-// }
-
+  //   return this.handler.withoutFilters(() => {
+  //     return this.handler.handleMessage(message, level, stackFrames, metadata);
+  //   });
+  // }
 
   /**
    * Manipulate the context for the events

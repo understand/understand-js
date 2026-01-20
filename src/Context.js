@@ -165,13 +165,11 @@ export default class Context {
       }
     }
 
-    const expires_at = new Date(
-      Date.now() + 1000 * SESSION_STORAGE_LIFETIME
-    );
+    const expires_at = new Date(Date.now() + 1000 * SESSION_STORAGE_LIFETIME);
 
     const session_id = sha1(
       [...Array(10)]
-        .map(function () {
+        .map(function() {
           return ((Math.random() * 36) | 0).toString(36);
         })
         .join('') + this.user.user_id
