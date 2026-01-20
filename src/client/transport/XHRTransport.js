@@ -1,4 +1,5 @@
 import BaseTransport from './BaseTransport';
+import { getGlobalObject } from 'applicationRoot/utils/helpers';
 
 export default class XHRTransport extends BaseTransport {
   /**
@@ -17,31 +18,67 @@ export default class XHRTransport extends BaseTransport {
   sendEvent(event) {
     return this.buffer.add(
       new Promise((resolve, reject) => {
-        const request = new XMLHttpRequest();
+        const global = getGlobalObject();
 
-        request.onreadystatechange = () => {
-          if (request.readyState !== 4) {
-            return;
-          }
+        const isBrowserXHR =
+          typeof global !== 'undefined' &&
+          typeof global.XMLHttpRequest === 'function';
 
-          if (request.status === 200) {
-            resolve({
-              status: request.status
+        // Browser implementation
+        if (isBrowserXHR) {
+          const request = new global.XMLHttpRequest();
+
+          request.onreadystatechange = () => {
+            if (request.readyState !== 4) return;
+
+            if (request.status === 200) {
+              resolve({ status: request.status });
+            } else {
+              reject(request);
+            }
+          };
+
+          request.open('POST', this.url, true);
+
+          if (this.headers) {
+            this.headers.forEach(function(value, key) {
+              request.setRequestHeader(key, value);
             });
           }
 
-          reject(request);
-        };
-        request.open('POST', this.url);
-
-        if (this.headers) {
-          // eslint-disable-next-line no-unused-vars
-          this.headers.forEach(function(value, key, map) {
-            request.setRequestHeader(key, value);
-          });
+          request.send(JSON.stringify(event));
+          return;
         }
 
-        request.send(JSON.stringify(event));
+        // Node.js implementation
+        if (typeof fetch === 'function') {
+          const headers = {};
+
+          if (this.headers) {
+            this.headers.forEach(function(value, key) {
+              headers[key] = value;
+            });
+          }
+
+          fetch(this.url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(event)
+          })
+            .then(response => {
+              if (response.ok) {
+                resolve({ status: response.status });
+              } else {
+                reject(response);
+              }
+            })
+            .catch(reject);
+
+          return;
+        }
+
+        // Unsupported runtime
+        reject(new Error('No supported HTTP client found'));
       })
     );
   }

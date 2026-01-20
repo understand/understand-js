@@ -14,11 +14,10 @@ export function enabled(val) {
  * @returns Global scope object
  */
 export function getGlobalObject() {
-  return typeof window !== 'undefined'
-    ? window
-    : typeof self !== 'undefined'
-    ? self
-    : {};
+  if (typeof window !== 'undefined') return window;
+  if (typeof self !== 'undefined') return self;
+  if (typeof global !== 'undefined') return global;
+  return {};
 }
 
 /**

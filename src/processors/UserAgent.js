@@ -9,13 +9,14 @@ export default class UserAgent extends BaseProcessor {
    */
   process(event) {
     const global = getGlobalObject();
+    let userAgent = 'Node.js';
 
-    if (!global.navigator || !global.location) {
-      return event;
+    if (global.navigator && global.navigator.userAgent) {
+      userAgent = global.navigator.userAgent;
     }
 
     return Object.assign({}, event, {
-      user_agent: global.navigator.userAgent
+      user_agent: userAgent
     });
   }
 }
