@@ -70,11 +70,6 @@ throw new Error('Understand.io test error');
 ## TypeScript Support
 As of the latest release, TypeScript support is now available via a dedicated type definitions package.
 
-Install the type definitions along with the main package:
-
-```
-npm install @understand/understand-js @types/understand__understand-js
-```
 You can also continue to use the global instance if preferred:
 ```ts
 Understand.init({
@@ -83,7 +78,7 @@ Understand.init({
 }).catchErrors();
 ```
 
-The ``@types/understand__understand-js`` package provides TypeScript interfaces for:
+The package provides TypeScript interfaces for:
 - UnderstandOptions
 - CatchErrorOptions
 - PatchConsoleOptions
@@ -140,7 +135,7 @@ try {
 ```js
 Understand.logMessage('The user added a new cart item.');
 ```
-## Console Log Support (New)
+## Console Log Support
 Understand.io now allows capturing console messages automatically: ``log``, ``info``, ``warn``, ``debug``, and ``error``
 
 ```js
