@@ -287,37 +287,6 @@ class Understand {
       return this.handler.handleMessage(message, level, [], metadata);
     });
   }
-  //   logMessage(msgOrError, level = Severity.Info, metadata = {}) {
-  //   if (!this.checkInitialized()) return;
-
-  //   // Convert unknown object to string
-  //   let message = '';
-  //   let stackFrames = [];
-
-  //   if (isError(msgOrError)) {
-  //     message = msgOrError.message;
-  //     stackFrames = StackTrace.fromErrorSync
-  //       ? [StackTrace.fromErrorSync(msgOrError)]
-  //       : [];
-  //   } else {
-  //     message = msgOrError != null ? String(msgOrError) : '';
-  //     // attach pseudo stack frame for console logs
-  //     stackFrames = [
-  //       {
-  //         getFileName: () => '(console)',
-  //         getLineNumber: () => 0,
-  //         getColumnNumber: () => 0,
-  //         getFunctionName: () => '(console)',
-  //         code: null,
-  //         getArgs: () => []
-  //       }
-  //     ];
-  //   }
-
-  //   return this.handler.withoutFilters(() => {
-  //     return this.handler.handleMessage(message, level, stackFrames, metadata);
-  //   });
-  // }
 
   /**
    * Manipulate the context for the events
